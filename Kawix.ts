@@ -215,7 +215,7 @@ export class Installer{
 
             // setx path
             let child= require("child_process")
-            child.exec_sync("setx", ["path", bin + ";%path%"])
+            child.execSync("setx", ["path", bin + ";%path%"])
 
         }
 
@@ -242,7 +242,7 @@ export class Installer{
 
         }
 
-        
+
 
 
     }
