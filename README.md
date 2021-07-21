@@ -1,2 +1,2 @@
-# core
-Runtime. Replacement of kawix/core
+# kw.runtime
+Replacement for kawix/core
