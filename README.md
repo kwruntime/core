@@ -29,7 +29,11 @@ Using the example extracted from deno.
 Welcome to Deno!
 ``` 
 
-Import in one line from any npm module:
+Import npm modules in one line using esm.sh
+(Coming soon..., waiting esm.sh add node target)
+
+
+Import any npm module in one line (internally uses yarn)
 
 ```typescript
 import Express from 'npm://express@4.17.1'
