@@ -176,7 +176,7 @@ class Installer {
       // setx path
       let child = require("child_process");
 
-      child.execSync("setx", ["path", bin + ";%path%"]);
+      child.execSync(`setx path "${bin};%path%"`);
     }
 
     let exe = this.$kawix.executable;
