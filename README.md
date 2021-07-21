@@ -11,7 +11,7 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 ## Installation
 
-Just now, you can install with node. This generate executable files (.cmd on windows) and set the PATH. 
+Just now, you can install with node. This generate executable files (.cmd on windows) and sets the **PATH** environment variable. 
 
 ```bash 
 > git clone https://github.com/kwruntime/core kwruntime
