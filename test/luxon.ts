@@ -1,18 +1,7 @@
+// adding ## after URL import make usable as an alias
+// in that way VisualStudioCode or any edit can 
+// show type definitions
+import "https://esm.sh/luxon##luxon" 
+import * as Luxon from 'luxon'
 
-import "https://esm.sh/express##express" // usage as alias
-import Express from 'express'
-
-main()
-async function main(){
-
-    const app = Express()
- 
-    app.get('/', function (req, res) {
-    res.send('Hello World')
-    })
-    
-    app.listen(3000)
-
-
-}
-
+console.info(Luxon.DateTime.fromMillis(Date.now()).toFormat("yyyy-MM-dd"))
