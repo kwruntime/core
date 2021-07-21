@@ -59,7 +59,7 @@ import {DateTime} from 'https://esm.sh/luxon'
 console.info(DateTime.fromMillis(Date.now()).toFormat("yyyy-MM-dd"))
 ```
 
-you will get a output like this:
+   you will get a output like this:
 
 ```bash 
 > kwrun luxon_test.ts
