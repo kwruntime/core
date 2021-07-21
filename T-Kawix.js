@@ -984,7 +984,7 @@ class Kawix {
       conv = await this.$getNetworkContent(resolv.request);
     } else if (resolv.request.startsWith("npm://")) {
       let name = resolv.request.substring(6);
-      let mod = await this.import("gh+/kwruntime/std@1.1.0/package/yarn.ts", null, scope);
+      let mod = await this.import("github://kwruntime/std@1.1.0/package/yarn.ts", null, scope);
       let reg = new mod.Registry();
       let location = await reg.resolve(name); //return await reg.require(name)
 
