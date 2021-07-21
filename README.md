@@ -21,7 +21,7 @@ Just now, you can install with node. This generate executable files (.cmd on win
 
 ## Get started
 
-Using the example extracted from deno.
+- Using the example extracted from deno (import url, typescript file).
 
 ```bash 
 > kwrun "https://cdn.deno.land/std/versions/0.102.0/raw/examples/welcome.ts"
@@ -29,12 +29,12 @@ Using the example extracted from deno.
 Welcome to Deno!
 ``` 
 
-Import npm modules in one line using esm.sh
+- Import **npm modules** in one line using [esm.sh](https://esm.sh)
 
-*(Coming soon..., waiting esm.sh add node target)*
+*(Coming soon... only waiting esm.sh add node target)*
 
 
-Import any npm module in one line (internally uses yarn)
+- Import any **npm module** in one line (internally uses yarn)
 
 ```typescript
 import Express from 'npm://express@4.17.1'
@@ -52,5 +52,20 @@ async function main(){
 ```
 
 
+- Import from URLs (like deno)
 
+```typescript
+import {DateTime} from 'https://esm.sh/luxon'
+console.info(DateTime.fromMillis(Date.now()).toFormat("yyyy-MM-dd"))
+```
+
+you will get a output like this:
+
+```bash 
+> kwrun luxon_test.ts
+[kwruntime] Compiling: /home/ubuntu/scripts/luxon_test.ts
+[kwruntime] Compiling: https://esm.sh/luxon
+[kwruntime] Compiling: https://cdn.esm.sh/v43/luxon@2.0.1/es2020/luxon.js
+2021-07-21
+```
 
