@@ -196,7 +196,7 @@ class Installer {
 
     let fileinfo = files.filter(a => a.startsWith("kwrun-") && a.endsWith(".cmd")).map(a => ({
       name: a,
-      v: a.split("-").slice(-1)[0].substring(1)
+      v: a.split("-").slice(-1)[0].split(".")[0].substring(1)
     }));
     fileinfo.sort((a, b) => Number(a.v) - Number(b.v));
 
