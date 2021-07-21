@@ -173,23 +173,38 @@ export class Installer{
                 return Path.join(Os.homedir(), "KwRuntime", "bin")
             }
         }
+        if(Os.platform() == "win32"){
+            return Path.join(Os.homedir(), "KwRuntime", "bin")
+        }
 
     }
 
 
     install(href:string, name: string, exe: string = "kwrun"){
 
-        let bin = this.getBinFolder()
-        let cmd = Path.join(bin, exe)
-        let out = Path.join(bin, name)
-        Fs.writeFileSync(out, [
-            `#!${cmd}`,
-            `export {default} from ${JSON.stringify(href)}`,
-            `export * from ${JSON.stringify(href)}`
-        ].join("\n"))
-        Fs.chmodSync(out,"775")
-        console.info("Installed!")
+        if(Os.platform() == "linux" || Os.platform() == "darwin"){
+            let bin = this.getBinFolder()
+            let cmd = Path.join(bin, exe)
+            let out = Path.join(bin, name)
+            Fs.writeFileSync(out, [
+                `#!${cmd}`,
+                `export {default} from ${JSON.stringify(href)}`,
+                `export * from ${JSON.stringify(href)}`
+            ].join("\n"))
+            Fs.chmodSync(out,"775")
+            console.info("Installed!")
+        }
+        else if(Os.platform() == "win32"){
 
+            let bin = this.getBinFolder()
+            let cmd = Path.join(bin, exe)
+            let out = Path.join(bin, name + ".cmd")
+            Fs.writeFileSync(out, [
+                `@echo off`,
+                `"${cmd}" "${href}" %*`
+            ].join("\n"))
+            console.info("Installed!")
+        }
     }
 
 
