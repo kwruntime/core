@@ -30,7 +30,8 @@ Welcome to Deno!
 ``` 
 
 Import npm modules in one line using esm.sh
-(Coming soon..., waiting esm.sh add node target)
+
+*(Coming soon..., waiting esm.sh add node target)*
 
 
 Import any npm module in one line (internally uses yarn)
