@@ -7,10 +7,10 @@ var Path = require("path")
 
 
 
-global.Babel = require("./babel.min.js")
+global.Babel = require("./lib/babel.min.js")
 global.BabelPlugins = {
-    dynamicImport: require("./babel.dynamic.import.js").default,
-    importMeta: require("./babel.import.meta.js").default
+    dynamicImport: require("./lib/babel.dynamic.import.js").default,
+    importMeta: require("./lib/babel.import.meta.js").default
     
 }
 
