@@ -1209,6 +1209,9 @@ export class Kawix{
         let func = Function(info.vars.names.join(","), info.result.code)
         await func.apply(func, info.vars.values)
         delete exports.__kawix__compile
+        if(exports.kawixPreload){
+            await exports.kawixPreload()
+        }
         return exports    
     }
 
