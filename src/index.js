@@ -14,7 +14,7 @@ global.BabelPlugins = {
     
 }
 
-var kawix = require("./Kawix.ts").Kawix
+var kawix = require("./Kawix.js").Kawix
 var kwcore = global.kwcore = global.kawix = new kawix()
 kwcore.$init()
 
