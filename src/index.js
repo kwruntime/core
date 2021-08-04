@@ -38,24 +38,65 @@ let program = async function(){
             await kwcore.installer.install(href, name, exe)
 
         }
-        else if(kwcore.appArguments[0]){
-            
-            let fname = global.kwcore.appArguments[0]
-            if(fname.startsWith("http:") || fname.startsWith("https:") || fname.startsWith("gh+/")
-                || fname.startsWith("github+/") || fname.startsWith("gitlab+/") || fname.startsWith("gh+/")
-                || fname.startsWith("github://") || fname.startsWith("gitlab://")){
-
-            }
-            else if(!Path.isAbsolute(fname)){
-                fname = Path.join(process.cwd(), fname)
-                global.kwcore.mainFilename = fname
-            }
-            
+        else if(kwcore.appArguments.length){
 
             module.__kawix__compiled = true
-            let mod = await global.kwcore.import(fname, module)
-            if(mod && mod.Program){
-                await mod.Program.main(global.kwcore.appArguments)
+            let g = function(a){
+                
+                let location = undefined 
+                if(a.location){
+                    location = {
+                        folder: a.location.folder,
+                        main: a.location.main
+                    }
+                }
+                return {
+                    location,
+                    filename: a.filename,
+                    request: a.request,
+                    requires: a.requires,
+                    imports: (a.preloadedModules || []).map(g)
+                }
+            }
+            if(kwcore.$startParams.cache !== undefined){
+                let res = []
+                for(let i=0;i<global.kwcore.appArguments.length;i++){
+                    let name = global.kwcore.appArguments[i]
+                    try{
+                        let info = g(await global.kwcore.importInfo(name))
+                        res.push(info)
+                    }catch(e){
+                        res.push({
+                            request: name, 
+                            error: {
+                                code: e.code,
+                                stack: e.stack,
+                                message: e.message
+                            }
+                        })
+                    }
+                }
+                console.info("[kwruntime] Cache result =", JSON.stringify(res))
+            }
+            else{
+
+                let fname = global.kwcore.appArguments[0]
+                if(fname.startsWith("http:") || fname.startsWith("https:") || fname.startsWith("gh+/")
+                    || fname.startsWith("github+/") || fname.startsWith("gitlab+/") || fname.startsWith("gh+/")
+                    || fname.startsWith("github://") || fname.startsWith("gitlab://")){
+
+                }
+                else if(!Path.isAbsolute(fname)){
+                    fname = Path.join(process.cwd(), fname)
+                    global.kwcore.mainFilename = fname
+                }
+                
+
+                
+                let mod = await global.kwcore.import(fname, module)
+                if(mod && mod.Program){
+                    await mod.Program.main(global.kwcore.appArguments)
+                }
             }
 
 

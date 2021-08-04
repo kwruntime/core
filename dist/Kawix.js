@@ -876,6 +876,7 @@ class Kawix {
       try {
         this.$importing.set(importing.name, importing);
         result = await this.$importInfo(resolv, parent, scope);
+        result.request = resolv.request;
       } catch (e) {
         error = e;
       }
