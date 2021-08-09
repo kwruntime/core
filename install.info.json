@@ -10,9 +10,15 @@
                 }
             ]
         },
-        "files": {
-            "runtime/Kawix.js": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js",
-            "runtime/kwruntime.js": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
-        }
+        "files": [
+            {
+                "path": "runtime/Kawix.js",
+                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js"
+            },
+            {
+                "path": "runtime/kwruntime.js",
+                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
+            }
+        ]
     }
 }
