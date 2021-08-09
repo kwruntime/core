@@ -1,11 +1,14 @@
 {
     "win32": {
-        "node": [
-            {
-                "version": "14.17.4",
-                "href": "https://k.m3ga.work/raw/kodhe/kawix/$3/.name./14.17.4.zip"
-            }
-        ],
+        "node": {
+            "x64": 
+            [
+                {
+                    "version": "14.17.4",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/$3/.name./14.17.4-x64.zip"
+                }
+            ]
+        },
         "files": {
             "runtime/Kawix.js": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js",
             "runtime/kwruntime.js": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
