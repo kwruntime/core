@@ -13,11 +13,11 @@
         "files": [
             {
                 "path": "runtime/Kawix.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js"
+                "href": "https://cdn.jsdelivr.net/gh/kwruntime/core/dist/Kawix.js"
             },
             {
                 "path": "runtime/kwruntime.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
+                "href": "https://cdn.jsdelivr.net/gh/kwruntime/core/dist/kwruntime.js"
             }
         ]
     }
