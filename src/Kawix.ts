@@ -241,8 +241,8 @@ export class Installer{
             term: Path.join(runtimeFolder,"default_executable.dll"),
             gui: Path.join(runtimeFolder,"default_gui_executable.dll")
         }
-        if(!fs.existsSync(defaultExes.term)) delete defaultExes.term
-        if(!fs.existsSync(defaultExes.gui)) delete defaultExes.gui
+        if(!Fs.existsSync(defaultExes.term)) delete defaultExes.term
+        if(!Fs.existsSync(defaultExes.gui)) delete defaultExes.gui
         let writeCmd = function(file:string, text:Buffer | string){
             Fs.writeFileSync(file, text)
             if(defaultExes.term){
