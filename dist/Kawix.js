@@ -188,12 +188,51 @@ class Installer {
 
     if (!_fs.default.existsSync(bin)) _fs.default.mkdirSync(bin);
 
+    let runtimeFolder = _path.default.join(kawixFolder, "runtime");
+
+    if (!_fs.default.existsSync(runtimeFolder)) _fs.default.mkdirSync(runtimeFolder);
+
     if (process.env.PATH.indexOf(bin) < 0) {
       // setx path
       let child = require("child_process");
 
       child.execSync(`setx path "${bin};%path%"`);
     }
+
+    let defaultExes = {
+      term: _path.default.join(runtimeFolder, "default_executable.dll"),
+      gui: _path.default.join(runtimeFolder, "default_gui_executable.dll")
+    };
+    if (!fs.existsSync(defaultExes.term)) delete defaultExes.term;
+    if (!fs.existsSync(defaultExes.gui)) delete defaultExes.gui;
+
+    let writeCmd = function (file, text) {
+      _fs.default.writeFileSync(file, text);
+
+      if (defaultExes.term) {
+        let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + ".exe");
+
+        try {
+          if (!_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+
+          _fs.default.copyFileSync(defaultExes.term, nfile);
+        } catch (e) {
+          console.error("[WARNING] Failed writing executable wrapper:", nfile);
+        }
+      }
+
+      if (defaultExes.gui) {
+        let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe");
+
+        try {
+          if (!_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+
+          _fs.default.copyFileSync(defaultExes.gui, nfile);
+        } catch (e) {
+          console.error("[WARNING] Failed writing executable wrapper:", nfile);
+        }
+      }
+    };
 
     let exe = this.$kawix.executable;
     let nodev = process.version.split(".")[0].substring(1);
@@ -218,10 +257,9 @@ class Installer {
 
     if (fileinfo.length) {
       let v = fileinfo[fileinfo.length - 1].v;
-
-      _fs.default.writeFileSync(_path.default.join(bin, "kwrun.cmd"), _fs.default.readFileSync(_path.default.join(bin, "kwrun-n" + v + ".cmd")));
-
-      _fs.default.writeFileSync(_path.default.join(bin, "kwrun-legacy.cmd"), _fs.default.readFileSync(_path.default.join(bin, "kwrun-legacy-n" + v + ".cmd")));
+      writeCmd(_path.default.join(bin, "kwrun.cmd"), _fs.default.readFileSync(_path.default.join(bin, "kwrun-n" + v + ".cmd")));
+      writeCmd(_path.default.join(bin, "kwrun-legacy.cmd"), _fs.default.readFileSync(_path.default.join(bin, "kwrun-legacy-n" + v + ".cmd"))); //Fs.writeFileSync(Path.join(bin, "kwrun.cmd"), )
+      //Fs.writeFileSync(Path.join(bin, "kwrun-legacy.cmd"), )
     }
   }
 

@@ -226,6 +226,8 @@ export class Installer{
         if(!Fs.existsSync(kawixFolder)) Fs.mkdirSync(kawixFolder)
         let bin = Path.join(kawixFolder, "bin")
         if(!Fs.existsSync(bin)) Fs.mkdirSync(bin) 
+        let runtimeFolder = Path.join(kawixFolder, "runtime")
+        if(!Fs.existsSync(runtimeFolder)) Fs.mkdirSync(runtimeFolder) 
 
         if(process.env.PATH.indexOf(bin) < 0){
 
@@ -235,8 +237,40 @@ export class Installer{
 
         }
 
-        let exe = this.$kawix.executable
+        let defaultExes = {
+            term: Path.join(runtimeFolder,"default_executable.dll"),
+            gui: Path.join(runtimeFolder,"default_gui_executable.dll")
+        }
+        if(!fs.existsSync(defaultExes.term)) delete defaultExes.term
+        if(!fs.existsSync(defaultExes.gui)) delete defaultExes.gui
+        let writeCmd = function(file:string, text:Buffer | string){
+            Fs.writeFileSync(file, text)
+            if(defaultExes.term){
+                let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + ".exe")
+                try{
+                    if(!Fs.existsSync(nfile))
+                        Fs.unlinkSync(nfile)
 
+                    Fs.copyFileSync(defaultExes.term, nfile)
+                }catch(e){
+                    console.error("[WARNING] Failed writing executable wrapper:", nfile)
+                }
+            }
+            if(defaultExes.gui){
+                let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe")
+                try{
+                    if(!Fs.existsSync(nfile))
+                        Fs.unlinkSync(nfile)
+
+                    Fs.copyFileSync(defaultExes.gui, nfile)
+                }catch(e){
+                    console.error("[WARNING] Failed writing executable wrapper:", nfile)
+                }
+            }
+        }
+
+
+        let exe = this.$kawix.executable
         let nodev = process.version.split(".")[0].substring(1)
         let content = `@echo off\n"${exe.cmd}" "${exe.args.join('" "')}" %*`
         let binFile = Path.join(bin, "kwrun-n" + nodev + ".cmd")
@@ -253,8 +287,11 @@ export class Installer{
         if(fileinfo.length){
 
             let v = fileinfo[fileinfo.length-1].v
-            Fs.writeFileSync(Path.join(bin, "kwrun.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-n" + v + ".cmd")))
-            Fs.writeFileSync(Path.join(bin, "kwrun-legacy.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-legacy-n" + v + ".cmd")))
+            writeCmd(Path.join(bin, "kwrun.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-n" + v + ".cmd")))
+            writeCmd(Path.join(bin, "kwrun-legacy.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-legacy-n" + v + ".cmd")))
+
+            //Fs.writeFileSync(Path.join(bin, "kwrun.cmd"), )
+            //Fs.writeFileSync(Path.join(bin, "kwrun-legacy.cmd"), )
 
         }
 
