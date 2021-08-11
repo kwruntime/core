@@ -29,7 +29,7 @@
             },
             {
                 "path": "runtime/winreg-vbs1.0.0",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg-vbs1.0.0"
+                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg-vbs1.0.0.js"
             }
         ]
     },
