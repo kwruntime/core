@@ -28,7 +28,7 @@
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
             },
             {
-                "path": "runtime/winreg-vbs1.0.0",
+                "path": "runtime/winreg-vbs1.0.0.js",
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg-vbs1.0.0.js"
             }
         ]
