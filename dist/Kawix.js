@@ -203,8 +203,8 @@ class Installer {
       term: _path.default.join(runtimeFolder, "default_executable.dll"),
       gui: _path.default.join(runtimeFolder, "default_gui_executable.dll")
     };
-    if (!fs.existsSync(defaultExes.term)) delete defaultExes.term;
-    if (!fs.existsSync(defaultExes.gui)) delete defaultExes.gui;
+    if (!_fs.default.existsSync(defaultExes.term)) delete defaultExes.term;
+    if (!_fs.default.existsSync(defaultExes.gui)) delete defaultExes.gui;
 
     let writeCmd = function (file, text) {
       _fs.default.writeFileSync(file, text);
@@ -213,7 +213,7 @@ class Installer {
         let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + ".exe");
 
         try {
-          if (!_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+          if (_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
 
           _fs.default.copyFileSync(defaultExes.term, nfile);
         } catch (e) {
@@ -225,7 +225,7 @@ class Installer {
         let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe");
 
         try {
-          if (!_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+          if (_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
 
           _fs.default.copyFileSync(defaultExes.gui, nfile);
         } catch (e) {

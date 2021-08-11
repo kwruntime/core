@@ -248,7 +248,7 @@ export class Installer{
             if(defaultExes.term){
                 let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + ".exe")
                 try{
-                    if(!Fs.existsSync(nfile))
+                    if(Fs.existsSync(nfile))
                         Fs.unlinkSync(nfile)
 
                     Fs.copyFileSync(defaultExes.term, nfile)
@@ -259,7 +259,7 @@ export class Installer{
             if(defaultExes.gui){
                 let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe")
                 try{
-                    if(!Fs.existsSync(nfile))
+                    if(Fs.existsSync(nfile))
                         Fs.unlinkSync(nfile)
 
                     Fs.copyFileSync(defaultExes.gui, nfile)
