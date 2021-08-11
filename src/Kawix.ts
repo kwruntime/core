@@ -224,7 +224,7 @@ export class Installer{
 
     async setExtensions(type: string, description: string, extensions: string[], terminal = true){
 
-        let name = "com.kodhe.com-" + type.replace(/\//g, '-')
+        let name = "com.kodhe.com-" + type.replace(/\//g, '-') + (terminal ? 'terminal' : '')
         let def = {
             resolve: null,
             reject: null,
