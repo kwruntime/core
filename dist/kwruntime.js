@@ -87,6 +87,7 @@ global.BabelPlugins = {
 
 var kawix = require("./Kawix.js").Kawix
 var kwcore = global.kwcore = global.kawix = new kawix()
+kwcore.winReg = require("./winreg1.2.4.js")
 kwcore.$init()
 
 

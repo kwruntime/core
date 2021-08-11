@@ -6,6 +6,7 @@ import crypto from 'crypto'
 
 import http from 'http'
 import https from 'https'
+//import Child from 'child_process'
 
 
 class Deferred<T> {
@@ -221,7 +222,89 @@ export class Installer{
 
     }
 
-    selfInstallWin32(){
+    async setExtensions(type: string, description: string, extensions: string[], terminal = true){
+
+        let name = "com.kodhe.com-" + type.replace(/\//g, '-')
+        let def = {
+            resolve: null,
+            reject: null,
+            promise: null 
+        }
+        def.promise= new Promise(function(a,b){
+            def.resolve = a 
+            def.reject = b
+        })
+        
+
+        let extnames = []
+        for(let ext of extensions){
+            extnames.push(`HKCU\\SOFTWARE\\Classes\\${ext}`)
+        }
+        let WinReg = global.kwcore.winReg
+        WinReg.createKey([...extnames, `HKCU\\SOFTWARE\\Classes\\${name}`,
+            `HKCU\\SOFTWARE\\Classes\\${name}\\DefaultIcon`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open\\command`], function(err) {
+            if(err) def.reject(err)
+            def.resolve()
+        })
+        await def.promise
+
+        def = {
+            resolve: null,
+            reject: null,
+            promise: null 
+        }
+        def.promise= new Promise(function(a,b){
+            def.resolve = a 
+            def.reject = b
+        })
+
+        let param:any = {}
+        for(let ext of extensions){
+            param[`HKCU\\SOFTWARE\\Classes\\${ext}`] = {
+                'default': {
+                    value: name,
+                    type: 'REG_DEFAULT'
+                },
+                'Content Type': {
+                    value: type,
+                    type: 'REG_SZ'
+                }
+            }
+        }
+
+        let kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun-gui.exe"
+        if(terminal){
+            kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun.exe"
+        }
+        let iconpath = kwrun
+
+        WinReg.putValue({
+            [`HKCU\\SOFTWARE\\Classes\\${name}`]: {
+                'default': {
+                    value: description || `Archivo ${type}`,
+                    type: 'REG_DEFAULT'
+                }
+            },
+            [`HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open\\command`]: {
+                'default': {
+                    value: `"${kwrun}" "%1"`,
+                    type: 'REG_DEFAULT'
+                }
+            },
+            [`HKCU\\SOFTWARE\\Classes\\${name}\\DefaultIcon`]: {
+                'default': {
+                    value: `"${iconpath}",0`,
+                    type: 'REG_DEFAULT'
+                }
+            }
+        }, function(err) {
+            if(err) def.reject(err)
+            def.resolve()
+        })
+        await def.promise
+    }
+
+    async selfInstallWin32(){
         let kawixFolder = Path.join(Os.homedir(), "KwRuntime")
         if(!Fs.existsSync(kawixFolder)) Fs.mkdirSync(kawixFolder)
         let bin = Path.join(kawixFolder, "bin")
@@ -295,8 +378,17 @@ export class Installer{
 
         }
 
+        await this.setExtensions("application/kwruntime.script", "Script de Kawix Runtime", [".kwts",".kwjs"])
+        await this.setExtensions("application/kwruntime.package", "Paquete de Kawix Runtime", [".kwpkg",".kwap"], false)
+        await this.setExtensions("application/kwruntime.package.terminal", "Paquete de Kawix Runtime", [".kwckg",".kwcpa"])
 
-
+        let Child= require("child_process")
+        try{
+            Child.execSync("ie4uinit.exe -ClearIconCache")
+        }catch(e){}
+        try{
+            Child.execSync("ie4uinit.exe -show")
+        }catch(e){}
 
     }
 
