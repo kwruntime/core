@@ -330,22 +330,33 @@ export class Installer{
             Fs.writeFileSync(file, text)
             if(defaultExes.term){
                 let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + ".exe")
+                let cfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + ".exe.config")
                 try{
-                    if(Fs.existsSync(nfile))
-                        Fs.unlinkSync(nfile)
+                    Fs.writeFileSync(nfile, Fs.readFileSync(defaultExes.term))
+                    Fs.writeFileSync(cfile, `<configuration>
+<startup>
+    <supportedRuntime version="v4.0"/>
+    <supportedRuntime version="v2.0.50727"/>
+</startup>
+</configuration>
+                  `)
 
-                    Fs.copyFileSync(defaultExes.term, nfile)
                 }catch(e){
                     console.error("[WARNING] Failed writing executable wrapper:", nfile)
                 }
             }
             if(defaultExes.gui){
                 let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe")
+                let cfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe.config")
                 try{
-                    if(Fs.existsSync(nfile))
-                        Fs.unlinkSync(nfile)
-
-                    Fs.copyFileSync(defaultExes.gui, nfile)
+                    Fs.writeFileSync(nfile, Fs.readFileSync(defaultExes.gui))
+                    Fs.writeFileSync(cfile, `<configuration>
+<startup>
+    <supportedRuntime version="v4.0"/>
+    <supportedRuntime version="v2.0.50727"/>
+</startup>
+</configuration>
+                  `)
                 }catch(e){
                     console.error("[WARNING] Failed writing executable wrapper:", nfile)
                 }

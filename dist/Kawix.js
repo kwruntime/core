@@ -293,10 +293,18 @@ class Installer {
       if (defaultExes.term) {
         let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + ".exe");
 
-        try {
-          if (_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+        let cfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + ".exe.config");
 
-          _fs.default.copyFileSync(defaultExes.term, nfile);
+        try {
+          _fs.default.writeFileSync(nfile, _fs.default.readFileSync(defaultExes.term));
+
+          _fs.default.writeFileSync(cfile, `<configuration>
+<startup>
+    <supportedRuntime version="v4.0"/>
+    <supportedRuntime version="v2.0.50727"/>
+</startup>
+</configuration>
+                  `);
         } catch (e) {
           console.error("[WARNING] Failed writing executable wrapper:", nfile);
         }
@@ -305,10 +313,18 @@ class Installer {
       if (defaultExes.gui) {
         let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe");
 
-        try {
-          if (_fs.default.existsSync(nfile)) _fs.default.unlinkSync(nfile);
+        let cfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe.config");
 
-          _fs.default.copyFileSync(defaultExes.gui, nfile);
+        try {
+          _fs.default.writeFileSync(nfile, _fs.default.readFileSync(defaultExes.gui));
+
+          _fs.default.writeFileSync(cfile, `<configuration>
+<startup>
+    <supportedRuntime version="v4.0"/>
+    <supportedRuntime version="v2.0.50727"/>
+</startup>
+</configuration>
+                  `);
         } catch (e) {
           console.error("[WARNING] Failed writing executable wrapper:", nfile);
         }
