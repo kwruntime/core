@@ -28,7 +28,7 @@
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
             },
             {
-                "path": "runtime/kwruntime.js",
+                "path": "runtime/winreg1.2.4.js",
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg1.2.4.js"
             }
         ]
@@ -54,7 +54,7 @@
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
             },
             {
-                "path": "runtime/kwruntime.js",
+                "path": "runtime/winreg1.2.4.js",
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg1.2.4.js"
             }
         ]
