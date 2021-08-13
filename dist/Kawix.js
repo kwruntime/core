@@ -235,7 +235,7 @@ class Installer {
     }
 
     let iconpath = kwrun;
-    WinReg.putValue({
+    WinReg.putValue(Object.assign(param, {
       [`HKCU\\SOFTWARE\\Classes\\${name}`]: {
         'default': {
           value: description || `Archivo ${type}`,
@@ -254,7 +254,7 @@ class Installer {
           type: 'REG_DEFAULT'
         }
       }
-    }, function (err) {
+    }), function (err) {
       if (err) def.reject(err);
       def.resolve();
     });

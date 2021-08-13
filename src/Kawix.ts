@@ -273,13 +273,14 @@ export class Installer{
             }
         }
 
+
         let kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun-gui.exe"
         if(terminal){
             kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun.exe"
         }
         let iconpath = kwrun
 
-        WinReg.putValue({
+        WinReg.putValue(Object.assign(param,{
             [`HKCU\\SOFTWARE\\Classes\\${name}`]: {
                 'default': {
                     value: description || `Archivo ${type}`,
@@ -298,7 +299,7 @@ export class Installer{
                     type: 'REG_DEFAULT'
                 }
             }
-        }, function(err) {
+        }), function(err) {
             if(err) def.reject(err)
             def.resolve()
         })
