@@ -28,8 +28,9 @@
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
             },
             {
-                "path": "runtime/winreg-vbs1.0.0.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg-vbs1.0.0.js"
+                "path": "runtime/winreg-vbs.tar.gz",
+                "compression": "tar+gz",
+                "href": "https://k.m3ga.work/raw/kodhe/kawix/$39/.name./winreg-vbs.tar.gz"
             }
         ]
     },
@@ -52,10 +53,6 @@
             {
                 "path": "runtime/kwruntime.js",
                 "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
-            },
-            {
-                "path": "runtime/winreg-vbs1.0.0.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/winreg-vbs1.0.0.js"
             }
         ]
     }

@@ -240,7 +240,8 @@ export class Installer{
         for(let ext of extensions){
             extnames.push(`HKCU\\SOFTWARE\\Classes\\${ext}`)
         }
-        let WinReg = global.kwcore.winReg
+        let WinReg = null 
+        WinReg = require("winreg-vbs")
         WinReg.createKey([...extnames, `HKCU\\SOFTWARE\\Classes\\${name}`,
             `HKCU\\SOFTWARE\\Classes\\${name}\\DefaultIcon`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open\\command`], function(err) {
             if(err) def.reject(err)

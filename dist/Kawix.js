@@ -181,7 +181,7 @@ class Installer {
   }
 
   async setExtensions(type, description, extensions, terminal = true) {
-    let name = "com.kodhe.com-" + type.replace(/\//g, '-');
+    let name = "com.kodhe.com-" + type.replace(/\//g, '-') + (terminal ? 'terminal' : '');
     let def = {
       resolve: null,
       reject: null,
@@ -197,7 +197,8 @@ class Installer {
       extnames.push(`HKCU\\SOFTWARE\\Classes\\${ext}`);
     }
 
-    let WinReg = global.kwcore.winReg;
+    let WinReg = null;
+    WinReg = require("winreg-vbs");
     WinReg.createKey([...extnames, `HKCU\\SOFTWARE\\Classes\\${name}`, `HKCU\\SOFTWARE\\Classes\\${name}\\DefaultIcon`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open\\command`], function (err) {
       if (err) def.reject(err);
       def.resolve();
