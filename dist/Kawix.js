@@ -361,8 +361,8 @@ class Installer {
     }
 
     await this.setExtensions("application/kwruntime.script", "Script de Kawix Runtime", [".kwts", ".kwjs"]);
-    await this.setExtensions("application/kwruntime.package", "Paquete de Kawix Runtime", [".kwpkg", ".kwap"], false);
-    await this.setExtensions("application/kwruntime.package.terminal", "Paquete de Kawix Runtime", [".kwckg", ".kwcpa"]);
+    await this.setExtensions("application/kwruntime.app", "Aplicación de Kawix Runtime", [".kwap"], false);
+    await this.setExtensions("application/kwruntime.package", "Paquete de Kawix Runtime", [".kwpkg"], false); //await this.setExtensions("application/kwruntime.package.terminal", "Paquete de Kawix Runtime", [".kwckg",".kwcpa"])
 
     let Child = require("child_process");
 
@@ -379,7 +379,6 @@ class Installer {
     let kawixFolder = _path.default.join(_os.default.homedir(), "KwRuntime");
 
     if (process.getuid() == 0) {
-      kawixFolder = "/usr/KwRuntime";
       if (!_fs.default.existsSync("/usr/KwRuntime")) _fs.default.mkdirSync("/usr/KwRuntime");
 
       _fs.default.symlinkSync("/usr/KwRuntime", kawixFolder);
