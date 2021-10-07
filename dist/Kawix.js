@@ -145,7 +145,11 @@ class Installer {
     }
   }
 
-  install(href, name, exe = "kwrun") {
+  install(href, name, options) {
+    if (href.endsWith(".kwt")) {}
+
+    let exe = options.executable || "kwrun";
+
     if (_os.default.platform() == "linux" || _os.default.platform() == "darwin") {
       let bin = this.getBinFolder();
 
@@ -157,6 +161,17 @@ class Installer {
 
       _fs.default.chmodSync(out, "775");
 
+      if (options.autostart !== undefined) {
+        // start with computer 
+        let folderAutoStart = _path.default.join(_os.default.homedir(), ".config", "autostart-scripts");
+
+        if (!_fs.default.existsSync(folderAutoStart)) {
+          _fs.default.mkdirSync(folderAutoStart);
+        }
+
+        _fs.default.symlinkSync(out, _path.default.join(folderAutoStart, name));
+      }
+
       console.info("Installed!");
     } else if (_os.default.platform() == "win32") {
       let bin = this.getBinFolder();
@@ -166,6 +181,9 @@ class Installer {
       let out = _path.default.join(bin, name + ".cmd");
 
       _fs.default.writeFileSync(out, [`@echo off`, `"${cmd}" "${href}" %*`].join("\n"));
+
+      if (options.autostart !== undefined) {// start with computer 
+      }
 
       console.info("Installed!");
     }
@@ -360,9 +378,9 @@ class Installer {
       //Fs.writeFileSync(Path.join(bin, "kwrun-legacy.cmd"), )
     }
 
-    await this.setExtensions("application/kwruntime.script", "Script de Kawix Runtime", [".kwts", ".kwjs"]);
-    await this.setExtensions("application/kwruntime.app", "Aplicación de Kawix Runtime", [".kwap"], false);
-    await this.setExtensions("application/kwruntime.package", "Paquete de Kawix Runtime", [".kwpkg"], false); //await this.setExtensions("application/kwruntime.package.terminal", "Paquete de Kawix Runtime", [".kwckg",".kwcpa"])
+    await this.setExtensions("application/kwruntime.script", "Script de Kawix Runtime", [".kws", ".kw.ts"]);
+    await this.setExtensions("application/kwruntime.app", "Aplicación de Kawix Runtime", [".kwr"], false);
+    await this.setExtensions("application/kwruntime.package", "Paquete de Kawix Runtime", [".kwt"], false); //await this.setExtensions("application/kwruntime.package.terminal", "Paquete de Kawix Runtime", [".kwckg",".kwcpa"])
 
     let Child = require("child_process");
 
@@ -1424,7 +1442,8 @@ class Kawix {
   $init() {
     this.originalArgv = process.argv;
     this.appArguments = process.argv.slice(2);
-    let offset = 0;
+    let offset = 0,
+        yet = false;
 
     for (let i = 0; i < this.appArguments.length; i++) {
       let arg = this.appArguments[i];
@@ -1437,8 +1456,9 @@ class Kawix {
         this.$startParams[name + "_Array"] = this.$startParams[name + "_Array"] || [];
         this.$startParams[name + "_Array"].push(value);
         this.optionsArguments.push(arg);
-        offset++;
+        if (!yet) offset++;
       } else {
+        yet = true;
         this.$startParams[".values"] = this.$startParams[".values"] || [];
         this.$startParams[".values"].push(arg);
       }

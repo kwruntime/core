@@ -27,18 +27,22 @@ let program = async function(){
         if(kwcore.$startParams["self-install"] !== undefined){
             await kwcore.installer.selfInstall()
         }
-        if(kwcore.$startParams["install"] !== undefined){
-            
+        if(kwcore.$startParams["install"] !== undefined){            
             let href = kwcore.$startParams["install"]
             let name = kwcore.$startParams["name"]
-            let exe = kwcore.$startParams["executable"]
-            if(!name  || !href){
-                console.error("Parameters: --install, --name are required to be non empty")
+            
+            if(!href){
+                console.error("Parameter --install is required")
                 process.exit(1)
             }
-            await kwcore.installer.install(href, name, exe)
 
+            //let exe = kwcore.$startParams["executable"]
+            delete kwcore.$startParams.install 
+            delete kwcore.$startParams.name 
+
+            await kwcore.installer.install(href, name, kwcore.$startParams)
         }
+        
         else if(kwcore.appArguments.length){
 
             module.__kawix__compiled = true
