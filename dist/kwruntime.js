@@ -169,7 +169,10 @@ let program = async function(){
                 
 
                 
-                let mod = await global.kwcore.import(fname, module)
+                let info = await global.kwcore.importInfo(fname, module, null, {
+                    main: true
+                })
+                let mod = await global.kwcore.importFromInfo(info)                
                 if(mod && mod.Program){
                     await mod.Program.main(global.kwcore.appArguments)
                 }

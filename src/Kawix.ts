@@ -990,6 +990,46 @@ export class Kawix{
     }
 
 
+    async importFromInfo(info: ModuleImportInfo){
+        if(info.builtin){
+            return info.exports
+        }
+        if(info.mode == "node"){
+            if(info.location){
+                return require(info.location.main)
+            }
+            else if(!info.executed){
+                // compile 
+                info.module["requireSync"] = (path)=> this.requireSync(path, info.module)
+                info.module["_compile"](info.result.code, info.filename)
+                return info.exports = info.module.exports
+            }
+        }
+
+
+        if(!info.executed){
+            let goodPreloadedModules = []
+            if(info.preloadedModules){
+                for(let i=0;i< info.preloadedModules.length;i++){
+                    let itemInfo = info.preloadedModules[i]
+                    let exp = await this.importFromInfo(itemInfo)
+                    goodPreloadedModules.push(exp)
+                }
+
+                let i = info.vars.names.indexOf("preloadedModules")
+                info.vars.values[i] = goodPreloadedModules
+            }
+            await this.defaultExecute(info, info.module.exports)                
+            info.executed = true 
+            info.exports = info.module.exports
+            return info.exports 
+        }
+        else{
+            return info.exports || info.module.exports
+        }
+    }
+   
+
     async import(request, parent = null, scope : Map<string, any> = null){
 
         let cache = this.$getCachedExports(request)
@@ -997,58 +1037,12 @@ export class Kawix{
 
 
         let info = await this.importInfo(request, parent, scope)
-        let getExportsFromInfo = async (info: ModuleImportInfo) => {
-
-            
-            
-            if(info.builtin){
-                return info.exports
-            }
-
-            if(info.mode == "node"){
-                if(info.location){
-                    return require(info.location.main)
-                }
-                else if(!info.executed){
-                    // compile 
-                    info.module["requireSync"] = (path)=> this.requireSync(path, info.module)
-                    info.module["_compile"](info.result.code, info.filename)
-                    return info.exports = info.module.exports
-                }
-            }
-
-
-            if(!info.executed){
-
-                let goodPreloadedModules = []
-                if(info.preloadedModules){
-                    for(let i=0;i< info.preloadedModules.length;i++){
-                        let itemInfo = info.preloadedModules[i]
-                        let exp = await getExportsFromInfo(itemInfo)
-                        goodPreloadedModules.push(exp)
-                    }
-
-                    let i = info.vars.names.indexOf("preloadedModules")
-                    info.vars.values[i] = goodPreloadedModules
-                }
-
-                await this.defaultExecute(info, info.module.exports)                
-                info.executed = true 
-                info.exports = info.module.exports
-                return info.exports 
-
-            }
-            else{
-                return info.exports || info.module.exports
-            }
-        }
-
-        return getExportsFromInfo(info)
+        return await this.importFromInfo(info)
     }
 
 
     
-    async importInfo(request, parent = null, scope : Map<string, any> = null) : Promise<ModuleImportInfo>{
+    async importInfo(request, parent = null, scope : Map<string, any> = null, props = {}) : Promise<ModuleImportInfo>{
 
         if(Module.builtinModules.indexOf(request) >= 0){
             return {
@@ -1088,7 +1082,7 @@ export class Kawix{
             }
             try{                
                 this.$importing.set(importing.name, importing)
-                result = await this.$importInfo(resolv, parent, scope)
+                result = await this.$importInfo(resolv, parent, scope, props)
                 result.request = resolv.request
             }catch(e){
                 error = e 
@@ -1120,7 +1114,7 @@ export class Kawix{
 
 
 
-    async $importInfo(resolv: any, parent, scope: Map<string,any>){
+    async $importInfo(resolv: any, parent, scope: Map<string,any>, props: any){
 
         let conv = null, meta = null
         if(resolv.virtual){
@@ -1177,7 +1171,7 @@ export class Kawix{
                 try{
                     
                     if(mod1.exports.__kawix__compile){
-                        let result = await this.defaultCompile(mod1, null, scope)
+                        let result = await this.defaultCompile(mod1, props, scope)
                         Object.assign(base, result)
                     }
                     else{
@@ -1256,6 +1250,7 @@ export class Kawix{
 
             scope.set(resolv.request, base)
             if(mod.__kawix__compile){
+                meta = Object.assign(meta|| {}, props)
                 let result = await this.defaultCompile(module, meta, scope)
                 Object.assign(base, result)
             }
@@ -1417,7 +1412,8 @@ export class Kawix{
         else{
             data.__local__vars["importMeta"] = {
                 meta: {
-                    url: "file://" + filename
+                    url: "file://" + filename,
+                    main: meta?.main
                 }
             }
         }

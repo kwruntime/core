@@ -955,55 +955,54 @@ class Kawix {
     }
   }
 
+  async importFromInfo(info) {
+    if (info.builtin) {
+      return info.exports;
+    }
+
+    if (info.mode == "node") {
+      if (info.location) {
+        return require(info.location.main);
+      } else if (!info.executed) {
+        // compile 
+        info.module["requireSync"] = path => this.requireSync(path, info.module);
+
+        info.module["_compile"](info.result.code, info.filename);
+        return info.exports = info.module.exports;
+      }
+    }
+
+    if (!info.executed) {
+      let goodPreloadedModules = [];
+
+      if (info.preloadedModules) {
+        for (let i = 0; i < info.preloadedModules.length; i++) {
+          let itemInfo = info.preloadedModules[i];
+          let exp = await this.importFromInfo(itemInfo);
+          goodPreloadedModules.push(exp);
+        }
+
+        let i = info.vars.names.indexOf("preloadedModules");
+        info.vars.values[i] = goodPreloadedModules;
+      }
+
+      await this.defaultExecute(info, info.module.exports);
+      info.executed = true;
+      info.exports = info.module.exports;
+      return info.exports;
+    } else {
+      return info.exports || info.module.exports;
+    }
+  }
+
   async import(request, parent = null, scope = null) {
     let cache = this.$getCachedExports(request);
     if (cache) return cache.data;
     let info = await this.importInfo(request, parent, scope);
-
-    let getExportsFromInfo = async info => {
-      if (info.builtin) {
-        return info.exports;
-      }
-
-      if (info.mode == "node") {
-        if (info.location) {
-          return require(info.location.main);
-        } else if (!info.executed) {
-          // compile 
-          info.module["requireSync"] = path => this.requireSync(path, info.module);
-
-          info.module["_compile"](info.result.code, info.filename);
-          return info.exports = info.module.exports;
-        }
-      }
-
-      if (!info.executed) {
-        let goodPreloadedModules = [];
-
-        if (info.preloadedModules) {
-          for (let i = 0; i < info.preloadedModules.length; i++) {
-            let itemInfo = info.preloadedModules[i];
-            let exp = await getExportsFromInfo(itemInfo);
-            goodPreloadedModules.push(exp);
-          }
-
-          let i = info.vars.names.indexOf("preloadedModules");
-          info.vars.values[i] = goodPreloadedModules;
-        }
-
-        await this.defaultExecute(info, info.module.exports);
-        info.executed = true;
-        info.exports = info.module.exports;
-        return info.exports;
-      } else {
-        return info.exports || info.module.exports;
-      }
-    };
-
-    return getExportsFromInfo(info);
+    return await this.importFromInfo(info);
   }
 
-  async importInfo(request, parent = null, scope = null) {
+  async importInfo(request, parent = null, scope = null, props = {}) {
     if (_module.default.builtinModules.indexOf(request) >= 0) {
       return {
         builtin: true,
@@ -1042,7 +1041,7 @@ class Kawix {
 
       try {
         this.$importing.set(importing.name, importing);
-        result = await this.$importInfo(resolv, parent, scope);
+        result = await this.$importInfo(resolv, parent, scope, props);
         result.request = resolv.request;
       } catch (e) {
         error = e;
@@ -1068,7 +1067,7 @@ class Kawix {
     }
   }
 
-  async $importInfo(resolv, parent, scope) {
+  async $importInfo(resolv, parent, scope, props) {
     var _conv;
 
     let conv = null,
@@ -1122,7 +1121,7 @@ class Kawix {
 
         try {
           if (mod1.exports.__kawix__compile) {
-            let result = await this.defaultCompile(mod1, null, scope);
+            let result = await this.defaultCompile(mod1, props, scope);
             Object.assign(base, result);
           } else {
             base.executed = true;
@@ -1192,6 +1191,7 @@ class Kawix {
       scope.set(resolv.request, base);
 
       if (mod.__kawix__compile) {
+        meta = Object.assign(meta || {}, props);
         let result = await this.defaultCompile(module, meta, scope);
         Object.assign(base, result);
       } else {
@@ -1346,7 +1346,8 @@ class Kawix {
     } else {
       data.__local__vars["importMeta"] = {
         meta: {
-          url: "file://" + filename
+          url: "file://" + filename,
+          main: meta === null || meta === void 0 ? void 0 : meta.main
         }
       };
     }
