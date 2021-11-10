@@ -960,6 +960,16 @@ class Kawix {
       return info.exports;
     }
 
+    if (info.mode == "yarn") {
+      var m = null;
+
+      for (let item of info.items) {
+        if (!m) m = require(item.main);
+      }
+
+      return m;
+    }
+
     if (info.mode == "node") {
       if (info.location) {
         return require(info.location.main);
@@ -1153,12 +1163,13 @@ class Kawix {
       let name = resolv.request.substring(6);
       let mod = await this.import("github://kwruntime/std@1.1.0/package/yarn.ts", null, scope);
       let reg = new mod.Registry();
-      let location = await reg.resolve(name); //return await reg.require(name)
+      let items = await reg.resolve(name);
+      if (!(items instanceof Array)) items = [items]; //return await reg.require(name)
 
       return {
         module: null,
-        mode: 'node',
-        location
+        mode: 'yarn',
+        items
       };
     }
 
@@ -1420,9 +1431,35 @@ class Kawix {
       // resolve first the requires ...
       keys.push("preloadedModules");
       values.push(preloadedModules);
+      let kitems = {};
 
       for (let i = 0; i < requires.length; i++) {
-        preloadedModules.push(await this.importInfo(requires[i], module, scope));
+        let parts = requires[i].split("/");
+
+        if (kitems[parts[0]]) {
+          let location = {};
+
+          if (parts.length == 1) {
+            location.main = kitems[parts[0]].main;
+          } else {
+            location.main = _path.default.join(kitems[parts[0]].folder, parts.slice(1).join("/"));
+          }
+
+          preloadedModules.push({
+            mode: 'node',
+            location
+          });
+        } else {
+          let imInfo = await this.importInfo(requires[i], module, scope);
+
+          if (imInfo.mode == "yarn") {
+            for (let item of imInfo.items) {
+              kitems[item.name] = item;
+            }
+          }
+
+          preloadedModules.push(imInfo);
+        }
       }
     }
 

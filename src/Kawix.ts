@@ -24,6 +24,15 @@ class Deferred<T> {
 	}
 }
 
+export interface ModuleInfo{
+    name: string,
+    version: string,
+    main?: string,
+    folder?: string,
+    packageJson?: PackageJsonInfo,
+    dependencies?: ModuleInfo[]
+}
+
 
 export interface ModuleImportInfo{
     mode?: string,
@@ -32,7 +41,7 @@ export interface ModuleImportInfo{
     exports?:any,
     builtin?: boolean
     request?: string 
-
+    items?: Array<ModuleInfo>,
     vars?: {
         names: string[]
         values: any[]
@@ -994,6 +1003,15 @@ export class Kawix{
         if(info.builtin){
             return info.exports
         }
+
+        if(info.mode == "yarn"){
+            var m = null 
+            for(let item of info.items){
+                if(!m) m = require(item.main)
+            }
+            return m 
+        }
+
         if(info.mode == "node"){
             if(info.location){
                 return require(info.location.main)
@@ -1209,13 +1227,13 @@ export class Kawix{
             let name = resolv.request.substring(6)
             let mod = await this.import("github://kwruntime/std@1.1.0/package/yarn.ts", null, scope)
             let reg = new mod.Registry()
-            let location = await reg.resolve(name)
-
+            let items = await reg.resolve(name)
+            if(!(items instanceof Array)) items = [items]
             //return await reg.require(name)
             return {
                 module: null,
-                mode: 'node',
-                location
+                mode: 'yarn',
+                items
             }
 
         }
@@ -1362,7 +1380,6 @@ export class Kawix{
             requires
         }
 
-
     }
 
 
@@ -1493,8 +1510,33 @@ export class Kawix{
             // resolve first the requires ...
             keys.push("preloadedModules")
             values.push(preloadedModules)
+
+            let kitems = {}
             for(let i=0;i<requires.length;i++){
-                preloadedModules.push(await this.importInfo(requires[i], module, scope))
+                let parts = requires[i].split("/")
+                if(kitems[parts[0]]){
+                    let location:any = {}
+                    if(parts.length == 1){
+                        location.main = kitems[parts[0]].main
+                    }
+                    else{
+                        location.main = Path.join(kitems[parts[0]].folder, parts.slice(1).join("/"))
+                    }
+                    
+                    preloadedModules.push({
+                        mode: 'node',
+                        location
+                    })
+                }
+                else{
+                    let imInfo = await this.importInfo(requires[i], module, scope)
+                    if(imInfo.mode == "yarn"){
+                        for(let item of imInfo.items){
+                            kitems[item.name] = item 
+                        }
+                    }
+                    preloadedModules.push(imInfo)
+                }
             }
         }
         
