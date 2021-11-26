@@ -16,7 +16,7 @@ Use the script available for install (recommended).
 * Linux 
 
 ```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@b649707/install/linux.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@565b6f4/install/linux.sh | bash
 ``` 
 
 
