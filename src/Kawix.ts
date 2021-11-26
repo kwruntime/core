@@ -242,7 +242,7 @@ export class Installer{
     // install in path
     selfInstall(){
 
-        if(Os.platform() == "linux" || Os.platform() == "darwin"){
+        if(Os.platform() == "linux" || Os.platform() == "darwin" || Os.platform() == "android"){
             return this.selfInstallUnix()
         }
         else if(Os.platform() == "win32"){
@@ -468,7 +468,7 @@ export class Installer{
 
         
 
-        content = `#!${exe.cmd} --http-parser-legacy ${exe.args.join(" ")}`
+        content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} $@\nexit $?`
         binFile = Path.join(bin, "kwrun-legacy-n" + nodev)
         Fs.writeFileSync(binFile, content)
         Fs.chmodSync(binFile, "775")
@@ -556,6 +556,8 @@ export class Kawix{
     mainFilename: string
     optionsArguments: string[] = []
     originalArgv: string[]
+
+    static $binaryMetadata = new Map<string, any>()
 
     $importing = new Map<string, any>() 
     $modCache = new Map<string, any>()
@@ -732,7 +734,59 @@ export class Kawix{
 
     }
 
-    
+    async getBinary(filename: string, name: string, offset: number = 0, count? : number){
+        
+        //console.info("Data:", data)
+        let binary = Kawix.$binaryMetadata.get(filename)
+        if(!binary){
+            let mod = await this.import(filename)    
+            binary = mod.__binary
+            if(binary){
+                Kawix.$binaryMetadata.set(filename, binary)
+            }
+        }
+        if(binary){
+            
+            let meta = binary.metadata[name]
+            if(meta){
+                let boffset = meta.offset + binary.offset
+                let fd = binary.fd || 0, buffer = null
+                try{
+                    if(!fd){
+                        fd = await new Promise<number>(function(a,b){
+                            Fs.open(binary.filename, "r", function(er, fd){
+                                if(er) return b(er)
+                                return a(fd)
+                            })
+                        })
+                        if(Os.platform() != "win32")
+                            binary.fd = fd 
+                    }
+                    if(count == undefined) count = meta.length
+                    let len = Math.min(meta.length, count)
+                    buffer = Buffer.allocUnsafe(len)
+                    await new Promise(function(a,b){
+                        Fs.read(fd, buffer, 0, buffer.length, boffset + offset, function(er, fd){
+                            if(er) return b(er)
+                            return a(fd)
+                        })
+                    })
+                }catch(e){
+                    throw e
+                }finally{
+                    if(fd && (Os.platform() == "win32")){
+                        await new Promise<void>(function(a,b){
+                            Fs.close(fd, function(er){
+                                if(er) return b(er)
+                                return a()
+                            })
+                        })
+                    }
+                }
+                return buffer
+            }
+        }
+    }    
 
     requireSync(request, parent, originalRequire = null){
 
@@ -1167,7 +1221,7 @@ export class Kawix{
 
             }
             else{
-
+                
                 mod1["_compile"]("exports.__source = " + JSON.stringify(source) + ";exports.__kawix__compile = true; exports.__local__vars = { module, require, __dirname, __filename, global, Buffer }; exports.__filename = " + JSON.stringify(name), name)
                 let base = {
                     module: mod1,
@@ -1315,7 +1369,7 @@ export class Kawix{
 
         // STRIP BOM
         source = source.replace(/^\uFEFF/gm, "").replace(/^\u00BB\u00BF/gm,"")
-
+        
         // IF #!....
         if(source.startsWith("#!")){
             let i = source.indexOf("\r") || source.indexOf("\n")
@@ -1616,36 +1670,84 @@ export class Kawix{
 
 // register .ts, .js extension
 
-async function Typescript(filename:string, module: Module, options: any): Promise<CompiledResult>{
+async function BinaryTypescript(filename: string, module: Module, options: any): Promise<CompiledResult>{
+    let fd = Fs.openSync(filename, "r")
+    let buffer = Buffer.allocUnsafe(500)
+    Fs.readSync(fd, buffer, 0, 500, 0)
+    let str = buffer.toString('binary')
+    let lines = str.split("\n")
+    let line = lines[0], offset = 0
+    if(line.startsWith("#!")){
+        offset += line.length + 1
+        line = lines[1]
+    }
+    offset += line.length + 1
 
+    let bytes = Buffer.from(line, "binary")
+    let sourceLen = bytes.readInt32LE(0)
+    let binaryMetaLen = bytes.readInt32LE(4)
     
+    buffer = Buffer.allocUnsafe(sourceLen)
+    Fs.readSync(fd, buffer, 0, buffer.length, offset)
+    let source = buffer.toString()
+
+    offset += sourceLen + 1
+    buffer = Buffer.allocUnsafe(binaryMetaLen)
+    Fs.readSync(fd, buffer, 0, buffer.length, offset)
+    //console.info(binaryMetaLen, buffer.toString())
+    let metadata = JSON.parse(buffer.toString())
+    let binary= {
+        metadata,
+        start: offset,
+        length: 0,
+        filename
+    }
+    let stat = Fs.fstatSync(fd)
+    binary.length = stat.size - binary.start
+    source += `\n;exports.__binary = ${JSON.stringify(binary)}`
+
+    let cmeta = Kawix.$binaryMetadata.get(filename)
+    if(cmeta?.fd){
+        Fs.closeSync(cmeta.fd)
+    }
+    //console.info(filename, binary)
+    Kawix.$binaryMetadata.set(filename, binary)
+    return await processTypescript(filename, source, options)
+}
+
+async function Typescript(filename:string, module: Module, options: any): Promise<CompiledResult>{
     let content = Fs.readFileSync(filename, "utf8")
-    
     // strip - bom  & bash env
     content = content.replace(/^\uFEFF/gm, "").replace(/^\u00BB\u00BF/gm,"")
-    if(content.startsWith("#!")){
-        
+    if(content.startsWith("#!")){        
         let i = content.indexOf("\r")
-        if(i < 0)  i= content.indexOf("\n")
-        
+        if(i < 0)  i= content.indexOf("\n")        
         if(i > 0) content = content.substring(i+1) 
         if(content[0] == "\n") content = content.substring(1)
     }
-    if(content.startsWith("// ESBUILD PACKAGE")){
-        module["_compile"](content, filename)
+    return await processTypescript(filename, content, options)
+}
+
+async function processTypescript(filename: string, source: string, options: any){
+    if(source.startsWith("// ESBUILD PACKAGE")){
+        module["_compile"](source, filename)
     }
     else{
-        let info = await global.kawix.compileSource(content, Object.assign({}, options, {
+        let info = await global.kawix.compileSource(source, Object.assign({}, options, {
             filename
         }))
         return info            
     }
-    
 }
+
 
 
 KModule.addExtensionLoader(".ts", {
     compile: Typescript
+})
+
+KModule.addExtensionLoader(".kwb", {
+    compile: BinaryTypescript
 })
 
 let defaultJs = Module["_extensions"][".js"]

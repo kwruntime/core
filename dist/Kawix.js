@@ -191,7 +191,7 @@ class Installer {
 
 
   selfInstall() {
-    if (_os.default.platform() == "linux" || _os.default.platform() == "darwin") {
+    if (_os.default.platform() == "linux" || _os.default.platform() == "darwin" || _os.default.platform() == "android") {
       return this.selfInstallUnix();
     } else if (_os.default.platform() == "win32") {
       return this.selfInstallWin32();
@@ -426,7 +426,7 @@ class Installer {
     }*/
 
 
-    content = `#!${exe.cmd} --http-parser-legacy ${exe.args.join(" ")}`;
+    content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} $@\nexit $?`;
     binFile = _path.default.join(bin, "kwrun-legacy-n" + nodev);
 
     _fs.default.writeFileSync(binFile, content);
@@ -717,6 +717,65 @@ class Kawix {
     }
 
     if (error) throw error;
+  }
+
+  async getBinary(filename, name, offset = 0, count) {
+    //console.info("Data:", data)
+    let binary = Kawix.$binaryMetadata.get(filename);
+
+    if (!binary) {
+      let mod = await this.import(filename);
+      binary = mod.__binary;
+
+      if (binary) {
+        Kawix.$binaryMetadata.set(filename, binary);
+      }
+    }
+
+    if (binary) {
+      let meta = binary.metadata[name];
+
+      if (meta) {
+        let boffset = meta.offset + binary.offset;
+        let fd = binary.fd || 0,
+            buffer = null;
+
+        try {
+          if (!fd) {
+            fd = await new Promise(function (a, b) {
+              _fs.default.open(binary.filename, "r", function (er, fd) {
+                if (er) return b(er);
+                return a(fd);
+              });
+            });
+            if (_os.default.platform() != "win32") binary.fd = fd;
+          }
+
+          if (count == undefined) count = meta.length;
+          let len = Math.min(meta.length, count);
+          buffer = Buffer.allocUnsafe(len);
+          await new Promise(function (a, b) {
+            _fs.default.read(fd, buffer, 0, buffer.length, boffset + offset, function (er, fd) {
+              if (er) return b(er);
+              return a(fd);
+            });
+          });
+        } catch (e) {
+          throw e;
+        } finally {
+          if (fd && _os.default.platform() == "win32") {
+            await new Promise(function (a, b) {
+              _fs.default.close(fd, function (er) {
+                if (er) return b(er);
+                return a();
+              });
+            });
+          }
+        }
+
+        return buffer;
+      }
+    }
   }
 
   requireSync(request, parent, originalRequire = null) {
@@ -1528,6 +1587,63 @@ class Kawix {
 
 exports.Kawix = Kawix;
 
+_defineProperty(Kawix, "$binaryMetadata", new Map());
+
+async function BinaryTypescript(filename, module, options) {
+  let fd = _fs.default.openSync(filename, "r");
+
+  let buffer = Buffer.allocUnsafe(500);
+
+  _fs.default.readSync(fd, buffer, 0, 500, 0);
+
+  let str = buffer.toString('binary');
+  let lines = str.split("\n");
+  let line = lines[0],
+      offset = 0;
+
+  if (line.startsWith("#!")) {
+    offset += line.length + 1;
+    line = lines[1];
+  }
+
+  offset += line.length + 1;
+  let bytes = Buffer.from(line, "binary");
+  let sourceLen = bytes.readInt32LE(0);
+  let binaryMetaLen = bytes.readInt32LE(4);
+  buffer = Buffer.allocUnsafe(sourceLen);
+
+  _fs.default.readSync(fd, buffer, 0, buffer.length, offset);
+
+  let source = buffer.toString();
+  offset += sourceLen + 1;
+  buffer = Buffer.allocUnsafe(binaryMetaLen);
+
+  _fs.default.readSync(fd, buffer, 0, buffer.length, offset); //console.info(binaryMetaLen, buffer.toString())
+
+
+  let metadata = JSON.parse(buffer.toString());
+  let binary = {
+    metadata,
+    start: offset,
+    length: 0,
+    filename
+  };
+
+  let stat = _fs.default.fstatSync(fd);
+
+  binary.length = stat.size - binary.start;
+  source += `\n;exports.__binary = ${JSON.stringify(binary)}`;
+  let cmeta = Kawix.$binaryMetadata.get(filename);
+
+  if (cmeta !== null && cmeta !== void 0 && cmeta.fd) {
+    _fs.default.closeSync(cmeta.fd);
+  } //console.info(filename, binary)
+
+
+  Kawix.$binaryMetadata.set(filename, binary);
+  return await processTypescript(filename, source, options);
+}
+
 async function Typescript(filename, module, options) {
   let content = _fs.default.readFileSync(filename, "utf8"); // strip - bom  & bash env
 
@@ -1541,10 +1657,14 @@ async function Typescript(filename, module, options) {
     if (content[0] == "\n") content = content.substring(1);
   }
 
-  if (content.startsWith("// ESBUILD PACKAGE")) {
-    module["_compile"](content, filename);
+  return await processTypescript(filename, content, options);
+}
+
+async function processTypescript(filename, source, options) {
+  if (source.startsWith("// ESBUILD PACKAGE")) {
+    module["_compile"](source, filename);
   } else {
-    let info = await global.kawix.compileSource(content, Object.assign({}, options, {
+    let info = await global.kawix.compileSource(source, Object.assign({}, options, {
       filename
     }));
     return info;
@@ -1553,6 +1673,9 @@ async function Typescript(filename, module, options) {
 
 KModule.addExtensionLoader(".ts", {
   compile: Typescript
+});
+KModule.addExtensionLoader(".kwb", {
+  compile: BinaryTypescript
 });
 let defaultJs = _module.default["_extensions"][".js"];
 KModule.addExtensionLoader(".js", {
