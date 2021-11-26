@@ -40,7 +40,13 @@ Welcome to Deno!
 
 - Import **npm modules** in one line using [esm.sh](https://esm.sh)
 
-*(Coming soon... only waiting esm.sh add node target)*
+Use ```target=node```
+
+```typescript
+import * as Luxon from "https://esm.sh/luxon?target=node"
+const date = Luxon.DateTime.now().toFormat("YYYY-MM-DD")
+``` 
+
 
 
 - Import any **npm module** in one line (internally uses yarn)
