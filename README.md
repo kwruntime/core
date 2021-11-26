@@ -13,13 +13,21 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 Here the options for install. In Android you can install using Termux  (please download Termux from F-Droid)
 
-* 1. Linux (supported: ```x64, armv7, arm64```)
+
+
+* Linux (supported: ```x64, armv7, arm64```)
 
 ```bash
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/linux.sh | bash
 ``` 
 
-* 2. Linux, Mac, Android with ```nodejs``` (please version 12 or higher)
+* Android (with Termux)
+
+```bash 
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@a60e7b8/install/android.sh | bash
+```
+
+* Linux, Mac, Android with ```nodejs``` (please version 12 or higher)
 
 Prerequisites:  Install nodejs from [https://nodejs.org/es/download/](https://nodejs.org/es/download/) or using distro package manager.
 In Android Termux you can install using: ```pkg install nodejs-lts``` or ```pkg install nodejs```
@@ -28,11 +36,11 @@ In Android Termux you can install using: ```pkg install nodejs-lts``` or ```pkg 
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/node.sh | bash
 ``` 
 
-* 3. Windows 
+* Windows 
 
 Installer coming soon ...
 
-* 4. Linux, Windows, Mac, Android with ```nodejs``` install from git
+* Install from git in any node supported platform (Linux, Mac, Windows, Android, etc)
 
 ```bash 
 > git clone https://github.com/kwruntime/core kwruntime
