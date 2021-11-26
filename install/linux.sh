@@ -26,6 +26,7 @@ case $(uname -m) in
     i686)   echo "Not supported"; exit 1 ;;
     x86_64) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id47/.name./node.tar.xz" ;;
     armv7l) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
+    armv7) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
     aarch64) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id46/.name./node.tar.xz" ;;
     *)   echo "Unable to determine system architecture."; exit 1 ;;
 esac
@@ -34,6 +35,7 @@ esac
 case $(uname -m) in
     x86_64) arch="x64" ; md5="5d3805ac6c6183a17ca76f0034d7924a" ;;
     armv7l) arch="arm" ; md5="c2444e79aaa6d6aa031568225a1b904d" ;;
+    armv7) arch="arm" ; md5="c2444e79aaa6d6aa031568225a1b904d" ;;
     aarch64) arch="arm64" ; md5="e1da6fdd3ae4cfe8af0c70dcd7d829e0" ;;
 esac
 
