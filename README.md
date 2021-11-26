@@ -13,7 +13,7 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 Use the script available for install (recommended). 
 
-* Linux (supported: x64, armv7, arm64)
+* Linux (supported: ```x64, armv7, arm64```)
 
 ```bash
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@565b6f4/install/linux.sh | bash
