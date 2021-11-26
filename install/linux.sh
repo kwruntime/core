@@ -16,10 +16,6 @@ if [[ ! -e "$_HOME/bin" ]]; then
 fi
 mkdir -p "$_HOME/src"
 
-
-
-
-
 nodeurl=""
 arch=""
 runtimeversion="16.13.0"
