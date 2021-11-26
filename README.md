@@ -44,7 +44,7 @@ Use ```target=node```
 
 ```typescript
 import * as Luxon from "https://esm.sh/luxon?target=node"
-const date = Luxon.DateTime.now().toFormat("YYYY-MM-DD")
+const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
 ``` 
 
 
