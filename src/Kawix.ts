@@ -468,7 +468,7 @@ export class Installer{
 
         
 
-        content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} $@\nexit $?`
+        content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} "$@"\nexit $?`
         binFile = Path.join(bin, "kwrun-legacy-n" + nodev)
         Fs.writeFileSync(binFile, content)
         Fs.chmodSync(binFile, "775")
