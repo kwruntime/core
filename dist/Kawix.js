@@ -426,7 +426,7 @@ class Installer {
     }*/
 
 
-    content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} $@\nexit $?`;
+    content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} "$@"\nexit $?`;
     binFile = _path.default.join(bin, "kwrun-legacy-n" + nodev);
 
     _fs.default.writeFileSync(binFile, content);
