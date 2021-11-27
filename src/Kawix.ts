@@ -176,7 +176,7 @@ export class Installer{
 
     getBinFolder(){
 
-        if(Os.platform() == "linux"){
+        if(Os.platform() == "linux"  || Os.platform() == "darwin" || Os.platform() == "android"){
             if(process.getuid() == 0){
                 return "/usr/KwRuntime/bin"
             }

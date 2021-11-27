@@ -132,7 +132,7 @@ class Installer {
   }
 
   getBinFolder() {
-    if (_os.default.platform() == "linux") {
+    if (_os.default.platform() == "linux" || _os.default.platform() == "darwin" || _os.default.platform() == "android") {
       if (process.getuid() == 0) {
         return "/usr/KwRuntime/bin";
       } else {
