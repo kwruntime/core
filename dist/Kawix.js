@@ -150,7 +150,7 @@ class Installer {
 
     let exe = options.executable || "kwrun";
 
-    if (_os.default.platform() == "linux" || _os.default.platform() == "darwin") {
+    if (_os.default.platform() == "linux" || _os.default.platform() == "darwin" || _os.default.platform() == "android") {
       let bin = this.getBinFolder();
 
       let cmd = _path.default.join(bin, exe);

@@ -198,7 +198,7 @@ export class Installer{
         }
 
         let exe = options.executable || "kwrun"
-        if(Os.platform() == "linux" || Os.platform() == "darwin"){
+        if(Os.platform() == "linux" || Os.platform() == "darwin" || Os.platform() == "android"){
             let bin = this.getBinFolder()
             let cmd = Path.join(bin, exe)
             let out = Path.join(bin, name)
