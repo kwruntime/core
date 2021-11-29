@@ -82,7 +82,7 @@ global.Babel = require("./lib/babel.min.js")
 global.BabelPlugins = {
     dynamicImport: require("./lib/babel.dynamic.import.js").default,
     importMeta: require("./lib/babel.import.meta.js").default
-    
+
 }
 
 var kawix = require("./Kawix.js").Kawix
@@ -98,33 +98,42 @@ let program = async function(){
         if(kwcore.$startParams["self-install"] !== undefined){
             await kwcore.installer.selfInstall()
         }
-        if(kwcore.$startParams["install"] !== undefined){            
+        if(kwcore.$startParams["install"] !== undefined){
             let href = kwcore.$startParams["install"]
             let name = kwcore.$startParams["name"]
-            
+
             if(!href){
                 console.error("Parameter --install is required")
                 process.exit(1)
             }
 
             //let exe = kwcore.$startParams["executable"]
-            delete kwcore.$startParams.install 
-            delete kwcore.$startParams.name 
+            delete kwcore.$startParams.install
+            delete kwcore.$startParams.name
 
             await kwcore.installer.install(href, name, kwcore.$startParams)
         }
-        
+
         else if(kwcore.appArguments.length){
 
             module.__kawix__compiled = true
             let g = function(a){
-                
-                let location = undefined 
+                //console.info(a)
+                let location = undefined
                 if(a.location){
                     location = {
                         folder: a.location.folder,
                         main: a.location.main
                     }
+                }
+                if(a.items && a.items.length ){
+                    // from npm
+                    location = {
+                        folder: a.items[0].folder,
+                        main: a.items[0].main
+                    }
+
+                    a.filename = location.main
                 }
                 return {
                     location,
@@ -143,7 +152,7 @@ let program = async function(){
                         res.push(info)
                     }catch(e){
                         res.push({
-                            request: name, 
+                            request: name,
                             error: {
                                 code: e.code,
                                 stack: e.stack,
@@ -166,13 +175,13 @@ let program = async function(){
                     fname = Path.join(process.cwd(), fname)
                     global.kwcore.mainFilename = fname
                 }
-                
 
-                
+
+
                 let info = await global.kwcore.importInfo(fname, module, null, {
                     main: true
                 })
-                let mod = await global.kwcore.importFromInfo(info)                
+                let mod = await global.kwcore.importFromInfo(info)
                 if(mod && mod.Program){
                     await mod.Program.main(global.kwcore.appArguments)
                 }
@@ -186,3 +195,4 @@ let program = async function(){
 }
 
 program()
+
