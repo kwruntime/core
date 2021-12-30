@@ -1300,9 +1300,18 @@ export class Kawix{
             })
 
             let items = {http, https}
+            let userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            userAgent = "Node/" + process.version
+            if(process.env.KW_USER_AGENT)
+                userAgent = process.env.KW_USER_AGENT
+
+            // add ?target=node
+            if(url.startsWith("https://esm.sh")){
+                if(url.indexOf("?") < 0) url += "?target=node"
+            }
             let req = items[url.startsWith("http:") ? "http": "https"].get(url, {
                 headers: {
-                    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                    "user-agent": userAgent
                 }
             },function(res){
                 if(res.statusCode == 302){
