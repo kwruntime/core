@@ -1305,10 +1305,7 @@ export class Kawix{
             if(process.env.KW_USER_AGENT)
                 userAgent = process.env.KW_USER_AGENT
 
-            // add ?target=node
-            if(url.startsWith("https://esm.sh")){
-                if(url.indexOf("?") < 0) url += "?target=node"
-            }
+            
             let req = items[url.startsWith("http:") ? "http": "https"].get(url, {
                 headers: {
                     "user-agent": userAgent
@@ -1914,11 +1911,18 @@ export class Kawix{
         else if(resolv.request.startsWith("https://")){
             let uri = new URL(resolv.request)
             let url = `${uri.protocol}//${uri.host}${uri.pathname}`
+            // add ?target=node
+            
             meta = {
                 url,
                 uri 
             }
-            conv = await this.$getNetworkContent(resolv.request)
+
+            let req = resolv.request
+            if(req.startsWith("https://esm.sh")){
+                if(req.indexOf("?") < 0) req += "?target=node"
+            }
+            conv = await this.$getNetworkContent(req)
         }
         else if(resolv.request.startsWith("npm://")){
             

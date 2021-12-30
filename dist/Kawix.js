@@ -1296,12 +1296,7 @@ class Kawix {
       };
       let userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
       userAgent = "Node/" + process.version;
-      if (process.env.KW_USER_AGENT) userAgent = process.env.KW_USER_AGENT; // add ?target=node
-
-      if (url.startsWith("https://esm.sh")) {
-        if (url.indexOf("?") < 0) url += "?target=node";
-      }
-
+      if (process.env.KW_USER_AGENT) userAgent = process.env.KW_USER_AGENT;
       let req = items[url.startsWith("http:") ? "http" : "https"].get(url, {
         headers: {
           "user-agent": userAgent
@@ -1869,12 +1864,19 @@ class Kawix {
       conv = await this.$getNetworkContent(resolv.request);
     } else if (resolv.request.startsWith("https://")) {
       let uri = new URL(resolv.request);
-      let url = `${uri.protocol}//${uri.host}${uri.pathname}`;
+      let url = `${uri.protocol}//${uri.host}${uri.pathname}`; // add ?target=node
+
       meta = {
         url,
         uri
       };
-      conv = await this.$getNetworkContent(resolv.request);
+      let req = resolv.request;
+
+      if (req.startsWith("https://esm.sh")) {
+        if (req.indexOf("?") < 0) req += "?target=node";
+      }
+
+      conv = await this.$getNetworkContent(req);
     } else if (resolv.request.startsWith("npm://")) {
       let name = resolv.request.substring(6);
       let mod = await this.import("github://kwruntime/std@1.1.0/package/yarn.ts", null, scope);
