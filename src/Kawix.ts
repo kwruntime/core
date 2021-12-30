@@ -1917,9 +1917,8 @@ export class Kawix{
                 url,
                 uri 
             }
-
             let req = resolv.request
-            if(req.startsWith("https://esm.sh")){
+            if(req.startsWith("https://esm.sh/")){
                 if(req.indexOf("?") < 0) req += "?target=node"
             }
             conv = await this.$getNetworkContent(req)
@@ -1927,7 +1926,7 @@ export class Kawix{
         else if(resolv.request.startsWith("npm://")){
             
             let name = resolv.request.substring(6)
-            let mod = await this.import("github://kwruntime/std@1.1.0/package/yarn.ts", null, scope)
+            let mod = await this.import("github://kwruntime/std@1.1.4/package/yarn.ts", null, scope)
             let reg = new mod.Registry()
             let items = await reg.resolve(name)
             if(!(items instanceof Array)) items = [items]
