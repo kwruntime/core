@@ -195,7 +195,8 @@ class Installer {
       this.selfInstallUnix();
       await this.installKwcore();
     } else if (_os.default.platform() == "win32") {
-      return this.selfInstallWin32();
+      this.selfInstallWin32();
+      await this.installKwcore();
     }
   }
 
@@ -467,12 +468,12 @@ Comment= `;
     let kwrun = '';
 
     if (appName) {
-      kwrun = "%USERPROFILE%\\KwRuntime\\bin\\" + appName + ".exe";
+      kwrun = _os.default.homedir() + "\\KwRuntime\\bin\\" + appName + ".exe";
     } else {
       if (terminal) {
-        kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun.exe";
+        kwrun = _os.default.homedir() + "\\KwRuntime\\bin\\kwrun.exe";
       } else {
-        kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun-gui.exe";
+        kwrun = _os.default.homedir() + "\\KwRuntime\\bin\\kwrun-gui.exe";
       }
     }
 
@@ -1258,6 +1259,7 @@ class Kawix {
     let name = _path.default.basename(uri.pathname);
 
     if (!ext) name += ".ts";
+    if (/^\.\d+$/.test(ext)) name += ".ts";
 
     let file = _path.default.join(this.$networkContentFolder, id + "-" + name);
 
@@ -1872,8 +1874,10 @@ class Kawix {
       };
       let req = resolv.request;
 
-      if (req.startsWith("https://esm.sh/")) {
-        if (req.indexOf("?") < 0) req += "?target=node";
+      if (!process.env.KW_USER_AGENT) {
+        if (req.startsWith("https://esm.sh/")) {
+          if (req.indexOf("?") < 0) req += "?target=node";
+        }
       }
 
       conv = await this.$getNetworkContent(req);

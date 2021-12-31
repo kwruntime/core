@@ -269,7 +269,8 @@ export class Installer{
             await this.installKwcore()
         }
         else if(Os.platform() == "win32"){
-            return this.selfInstallWin32()
+            this.selfInstallWin32()
+            await this.installKwcore()
         }
 
     }
@@ -538,13 +539,13 @@ Comment= `
 
         let kwrun = ''
         if(appName){
-            kwrun = "%USERPROFILE%\\KwRuntime\\bin\\" + appName + ".exe"
+            kwrun = Os.homedir() + "\\KwRuntime\\bin\\" + appName + ".exe"
         }
         else{
             if(terminal){
-                kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun.exe"
+                kwrun = Os.homedir() + "\\KwRuntime\\bin\\kwrun.exe"
             }else{
-                kwrun = "%USERPROFILE%\\KwRuntime\\bin\\kwrun-gui.exe"
+                kwrun = Os.homedir() + "\\KwRuntime\\bin\\kwrun-gui.exe"
             }
         }
 
@@ -1273,6 +1274,8 @@ export class Kawix{
         let ext = Path.extname(uri.pathname)
         let name = Path.basename(uri.pathname)
         if(!ext) name += ".ts"
+        if(/^\.\d+$/.test(ext)) name += ".ts"
+
         let file = Path.join(this.$networkContentFolder, id + "-" +  name)
         if(Fs.existsSync(file)){
             this.$addOriginalURL(file, url)
@@ -1918,8 +1921,10 @@ export class Kawix{
                 uri 
             }
             let req = resolv.request
-            if(req.startsWith("https://esm.sh/")){
-                if(req.indexOf("?") < 0) req += "?target=node"
+            if(!process.env.KW_USER_AGENT){
+                if(req.startsWith("https://esm.sh/")){
+                    if(req.indexOf("?") < 0) req += "?target=node"
+                }
             }
             conv = await this.$getNetworkContent(req)
         }
