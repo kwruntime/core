@@ -192,11 +192,11 @@ class Installer {
 
   async selfInstall() {
     if (_os.default.platform() == "linux" || _os.default.platform() == "darwin" || _os.default.platform() == "android") {
-      this.selfInstallUnix();
-      await this.installKwcore();
+      this.selfInstallUnix(); // DISABLE AUTO INSTALL OF KAWIX/CORE
+      //await this.installKwcore()
     } else if (_os.default.platform() == "win32") {
-      this.selfInstallWin32();
-      await this.installKwcore();
+      this.selfInstallWin32(); // DISABLE AUTO INSTALL OF KAWIX/CORE
+      //await this.installKwcore()
     }
   }
 
@@ -709,9 +709,9 @@ Comment= `;
       }
 
       if (defaultExes.gui) {
-        let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "w.exe");
+        let nfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe");
 
-        let cfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "w.exe.config");
+        let cfile = _path.default.join(_path.default.dirname(file), _path.default.basename(file, _path.default.extname(file)) + "-gui.exe.config");
 
         try {
           _fs.default.writeFileSync(nfile, _fs.default.readFileSync(defaultExes.gui));
@@ -778,7 +778,7 @@ Comment= `;
       description: "Aplicación de KawixCore",
       extensions: [".kwa"],
       terminal: false,
-      appName: "kwcorew"
+      appName: "kwcore-gui"
     });
 
     let Child = require("child_process");

@@ -266,11 +266,13 @@ export class Installer{
 
         if(Os.platform() == "linux" || Os.platform() == "darwin" || Os.platform() == "android"){            
             this.selfInstallUnix()
-            await this.installKwcore()
+            // DISABLE AUTO INSTALL OF KAWIX/CORE
+            //await this.installKwcore()
         }
         else if(Os.platform() == "win32"){
             this.selfInstallWin32()
-            await this.installKwcore()
+            // DISABLE AUTO INSTALL OF KAWIX/CORE
+            //await this.installKwcore()
         }
 
     }
@@ -758,8 +760,8 @@ Comment= `
                 }
             }
             if(defaultExes.gui){
-                let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "w.exe")
-                let cfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "w.exe.config")
+                let nfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe")
+                let cfile = Path.join(Path.dirname(file), Path.basename(file, Path.extname(file)) + "-gui.exe.config")
                 try{
                     Fs.writeFileSync(nfile, Fs.readFileSync(defaultExes.gui))
                     Fs.writeFileSync(cfile, `<configuration>
@@ -820,7 +822,7 @@ Comment= `
             description: "Aplicación de KawixCore",
             extensions: [".kwa"],
             terminal: false,
-            appName: "kwcorew"
+            appName: "kwcore-gui"
         })
 
         let Child= require("child_process")

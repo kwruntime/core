@@ -27,6 +27,9 @@ let program = async function(){
         if(kwcore.$startParams["self-install"] !== undefined){
             await kwcore.installer.selfInstall()
         }
+        else if(kwcore.$startParams["install-kwcore"] !== undefined){
+            await kwcore.installer.installKwcore()
+        }
         if(kwcore.$startParams["install"] !== undefined){
             let href = kwcore.$startParams["install"]
             let name = kwcore.$startParams["name"]
