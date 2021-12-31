@@ -650,10 +650,15 @@ Comment= `;
 
     if (!_fs.default.existsSync(bin)) _fs.default.mkdirSync(bin);
 
+    let src = _path.default.join(kawixFolder, "src");
+
+    if (!_fs.default.existsSync(src)) _fs.default.mkdirSync(src);
+
     let runtimeFolder = _path.default.join(kawixFolder, "runtime");
 
     if (!_fs.default.existsSync(runtimeFolder)) _fs.default.mkdirSync(runtimeFolder);
     return {
+      src,
       runtime: runtimeFolder,
       bin,
       folder: kawixFolder
@@ -724,15 +729,24 @@ Comment= `;
       }
     };
 
+    let src = $paths.src;
+
+    let kwcoreFolder = _path.default.join(_os.default.homedir(), "Kawix");
+
+    let kwcoreFile = _path.default.join(src, "kwcore.app.js");
+
+    let kwcoreCli = _path.default.join(kwcoreFolder, "core", "bin", "cli");
+
     let exe = this.$kawix.executable;
+    await this.$downloadKwcore(kwcoreFile);
     let nodev = process.version.split(".")[0].substring(1);
-    let content = `@echo off\n"${exe.cmd}" "${exe.args.join('" "')}" %*`;
+    let content = `@echo off\n"${exe.cmd}" "${kwcoreCli}" %*`;
 
     let binFile = _path.default.join(bin, "kwcore-n" + nodev + ".cmd");
 
     _fs.default.writeFileSync(binFile, content);
 
-    content = `@echo off\n"${exe.cmd}" --http-parser-legacy "${exe.args.join('" "')}" %*`;
+    content = `@echo off\n"${exe.cmd}" --http-parser-legacy "${kwcoreCli}" %*`;
     binFile = _path.default.join(bin, "kwcore-legacy-n" + nodev + ".cmd");
 
     _fs.default.writeFileSync(binFile, content);
@@ -776,6 +790,42 @@ Comment= `;
     try {
       Child.execSync("ie4uinit.exe -show");
     } catch (e) {}
+  }
+
+  async $downloadKwcore(kwcoreFile) {
+    // download file 
+    let exe = this.$kawix.executable;
+    let uri = "https://raw.githubusercontent.com/kodhework/kawix/master/core/dist/kwcore.app.js";
+    await new Promise(function (resolve, reject) {
+      _https.default.get(uri, res => {
+        try {
+          let buffer = [];
+          res.on("data", function (bytes) {
+            buffer.push(bytes);
+          });
+          res.on("end", function () {
+            try {
+              let data = Buffer.concat(buffer);
+
+              _fs.default.writeFileSync(kwcoreFile, data);
+
+              resolve(null);
+            } catch (e) {
+              reject(e);
+            }
+          });
+        } catch (e) {
+          reject(e);
+        }
+      }).on("error", reject);
+    });
+
+    let p = require("child_process").spawn(exe.cmd, [kwcoreFile]);
+
+    await new Promise(function (resolve, reject) {
+      p.on("exit", resolve);
+      p.on("error", reject);
+    });
   }
 
   async installKwcoreUnix() {
