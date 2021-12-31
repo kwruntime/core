@@ -4,17 +4,17 @@
             "x64": 
             [
                 {
-                    "version": "14.17.4",
-                    "name": "14.17.4-win32-x64-1.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id18"
+                    "version": "16.3.1",
+                    "name": "16.3.1-win32-x64.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id49"
                 }
             ],
             "x86": 
             [
                 {
-                    "version": "14.17.4",
-                    "name": "14.17.4-win32-x86-1.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id15"
+                    "version": "16.3.1",
+                    "name": "16.3.1-win32-x86.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id50"
                 }
             ]
         },
@@ -42,6 +42,27 @@
                     "version": "14.17.4",
                     "name": "14.17.4-linux-x64.tar.gz",
                     "href": "https://k.m3ga.work/raw/kodhe/kawix/id10"
+                },
+                {
+                    "version": "16.3.0",
+                    "name": "16.3.0-linux-x64.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id47"
+                }
+            ],
+            "arm": 
+            [
+                {
+                    "version": "16.3.0",
+                    "name": "16.3.0-linux-arm.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id45"
+                }
+            ],
+            "arm": 
+            [
+                {
+                    "version": "16.3.0",
+                    "name": "16.3.0-linux-arm64.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id46"
                 }
             ]
         },
