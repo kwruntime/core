@@ -1,5 +1,5 @@
 
-import * as Types from './types'
+import * as Types from './types.ts'
 
 function _kawix(): Types.Kawix{
 	return global.kawix 
