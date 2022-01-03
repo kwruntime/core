@@ -1,5 +1,5 @@
 {
     "name": "kwruntime",
-    "version": "1.1.4",
+    "version": "1.1.8",
     "main": "dist/kwruntime.js"
 }

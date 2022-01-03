@@ -1205,7 +1205,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.3"
+        return "1.1.8"
     }
 
     get installer(){
