@@ -6,7 +6,8 @@ import crypto from 'crypto'
 
 import http from 'http'
 import https from 'https'
-//import Child from 'child_process'
+import {DesktopConfig,ExtensionConfig,ModuleInfo,ModuleImportInfo, Loader, CompiledResult} from './types'
+
 
 
 class Deferred<T> {
@@ -25,82 +26,6 @@ class Deferred<T> {
 }
 
 
-interface DesktopConfig{
-    id?: string 
-    appName: string 
-    types: string[]
-    title: string
-    terminal?: boolean
-    
-    nodisplay?: boolean
-}
-
-interface ExtensionConfig{
-    id?: string 
-    type: string
-    description: string
-    extensions: string[]
-    terminal?: boolean
-    appName?: string
-}
-
-
-
-export interface ModuleInfo{
-    name: string,
-    version: string,
-    main?: string,
-    folder?: string,
-    packageJson?: PackageJsonInfo,
-    dependencies?: ModuleInfo[]
-}
-
-
-export interface ModuleImportInfo{
-    mode?: string,
-    filename?: string
-    module?: Module,
-    exports?:any,
-    builtin?: boolean
-    request?: string 
-    items?: Array<ModuleInfo>,
-    vars?: {
-        names: string[]
-        values: any[]
-    }
-
-    content?: string,
-    result?: {
-        code: string
-        ast?: any
-    }
-
-    location?: {
-        folder: string,
-        main: string
-    }
-
-    executed?: boolean
-    requires?: string[]
-    preloadedModules?: ModuleImportInfo[]
-}
-
-export interface Loader{
-    compile(filename:string, module: Module, options: any): Promise<CompiledResult>
-    preload?(module: Module, filename: string, defaultPreload: Function): void
-}
-
-export interface CompiledResult{
-    content?: string,
-    requires: string[],
-    result: {
-        code: string,
-        ast?: any
-    },
-    stat?: {
-        mtimeMs: number
-    }
-}
 
 export class KModule{
 
@@ -169,6 +94,10 @@ export class KModule{
     disableInjectImport(){}
     /* backward */
 
+
+    getData(name: string) {
+        return Kawix.getData(this.$module.__kawix__filename, name)
+    }
 
     addVirtualFile(){
         return KModule.addVirtualFile.apply(KModule, arguments) 
@@ -1247,6 +1176,7 @@ export class BinaryData{
 }
 
 
+
 export class Kawix{
 
     appArguments: string[] = []
@@ -1257,6 +1187,8 @@ export class Kawix{
 
     static $binaryMetadata = new Map<string, any>()
     static $binaryFiles = new Map<string, any>()
+    static $modulesData = new Map<string, Map<string, any>>()
+
 
     $importing = new Map<string, any>() 
     $modCache = new Map<string, any>()
@@ -1267,8 +1199,6 @@ export class Kawix{
     $originals = new Map<string, any>()
     $startParams:any = {}
 
-
-    
 
     get argv():string[]{
         return this.appArguments
@@ -1290,6 +1220,28 @@ export class Kawix{
             cmd: this.originalArgv[0],
             args: [this.originalArgv[1]]
         }
+    }
+
+
+    static getData(filename: string, name: string){
+        let data = Kawix.$modulesData.get(filename)
+        if(data){
+            return data.get(name)
+        }
+    }
+    static setData(filename: string, name: string, value: any){
+        let data = Kawix.$modulesData.get(filename)
+        if(!data) Kawix.$modulesData.set(filename, data = new Map<string,any>())
+        data.set(name, value)
+    }
+
+
+    getData(filename: string, name: string){
+        return Kawix.getData(filename, name)
+    }
+
+    setData(filename: string, name: string, value: any){
+        return Kawix.setData(filename, name, value)
     }
 
     get svgIcon(){
@@ -2185,9 +2137,15 @@ export class Kawix{
                         line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + aliases[mod] + "]")
                     }
                     else{
-                        // module to load 
-                        requires.push(mod)
-                        line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + String(z++) + "]")
+                        
+                        if(/kwruntime\/core(\@[0-9\.A-Za-z]+)?\/src\/kwruntime(\.ts)?$/.test(mod)){
+                            // Internal module
+                            line = line.replace(/require\(\"([^\"]+)\"\)/, "{KModule:KModule, kawix: global.kawix}")
+                        }
+                        else{
+                            requires.push(mod)
+                            line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + String(z++) + "]")
+                        }
                     }
                 }
                 nhead.push(line)
@@ -2259,6 +2217,8 @@ export class Kawix{
                 }
             }
         }
+
+        module.__kawix__filename = filename
         let kmodule = data.__local__vars["KModule"] = new KModule(module)
         data.__local__vars["asyncRequire"] = kmodule.import.bind(kmodule)        
         //let originalRequire = data.__local__vars["require"]

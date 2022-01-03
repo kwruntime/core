@@ -33,7 +33,6 @@ function _classApplyDescriptorSet(receiver, descriptor, value) { if (descriptor.
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//import Child from 'child_process'
 class Deferred {
   constructor() {
     this._promise = new Promise((resolve, reject) => {
@@ -105,6 +104,10 @@ class KModule {
   disableInjectImport() {}
   /* backward */
 
+
+  getData(name) {
+    return Kawix.getData(this.$module.__kawix__filename, name);
+  }
 
   addVirtualFile() {
     return KModule.addVirtualFile.apply(KModule, arguments);
@@ -1302,6 +1305,28 @@ class Kawix {
     };
   }
 
+  static getData(filename, name) {
+    let data = Kawix.$modulesData.get(filename);
+
+    if (data) {
+      return data.get(name);
+    }
+  }
+
+  static setData(filename, name, value) {
+    let data = Kawix.$modulesData.get(filename);
+    if (!data) Kawix.$modulesData.set(filename, data = new Map());
+    data.set(name, value);
+  }
+
+  getData(filename, name) {
+    return Kawix.getData(filename, name);
+  }
+
+  setData(filename, name, value) {
+    return Kawix.setData(filename, name, value);
+  }
+
   get svgIcon() {
     return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         <!-- Created with Inkscape (http://www.inkscape.org/) -->
@@ -2160,9 +2185,13 @@ class Kawix {
           if (aliases[mod] !== undefined) {
             line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + aliases[mod] + "]");
           } else {
-            // module to load 
-            requires.push(mod);
-            line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + String(z++) + "]");
+            if (/kwruntime\/core(\@[0-9\.A-Za-z]+)?\/src\/kwruntime(\.ts)?$/.test(mod)) {
+              // Internal module
+              line = line.replace(/require\(\"([^\"]+)\"\)/, "{KModule:KModule, kawix: global.kawix}");
+            } else {
+              requires.push(mod);
+              line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + String(z++) + "]");
+            }
           }
         }
 
@@ -2233,6 +2262,7 @@ class Kawix {
       };
     }
 
+    module.__kawix__filename = filename;
     let kmodule = data.__local__vars["KModule"] = new KModule(module);
     data.__local__vars["asyncRequire"] = kmodule.import.bind(kmodule); //let originalRequire = data.__local__vars["require"]
 
@@ -2401,6 +2431,8 @@ exports.Kawix = Kawix;
 _defineProperty(Kawix, "$binaryMetadata", new Map());
 
 _defineProperty(Kawix, "$binaryFiles", new Map());
+
+_defineProperty(Kawix, "$modulesData", new Map());
 
 let Zlib = null;
 
