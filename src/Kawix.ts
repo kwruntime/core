@@ -667,13 +667,13 @@ Comment= `
         await this.setExtensions({
             type: "application/kwruntime.script",
             description: "Script de Kawix Runtime",
-            extensions: [".kws", ".kw.ts"],
+            extensions: [".kws", ".kw.ts", ".kwc"],
             terminal: true
         })
         await this.setExtensions({
             type: "application/kwruntime.app",
             description: "Aplicación de Kawix Runtime",
-            extensions: [".kwr"],
+            extensions: [".kwr", ".kwb"],
             terminal: false
         })
         await this.setExtensions({
@@ -1124,13 +1124,13 @@ Comment= `
         await this.setExtensions({
             type: "application/kwruntime.script",
             description: "Script de Kawix Runtime",
-            extensions: [".kws", ".kw.ts"],
+            extensions: [".kws", ".kw.ts", ".kwc"],
             terminal: true
         })
         await this.setExtensions({
             type: "application/kwruntime.app",
             description: "Aplicación de Kawix Runtime",
-            extensions: [".kwr"],
+            extensions: [".kwr", ".kwb"],
             terminal: false
         })
         await this.setExtensions({
@@ -1146,6 +1146,107 @@ Comment= `
 
 }
 
+export class BinaryData{
+
+    #kawix: Kawix 
+    #filename: string
+
+    constructor(kawix:Kawix, filename: string){
+        this.#kawix = kawix
+        this.#filename = filename
+    }
+
+    async getMetadata(){
+
+        let binary = Kawix.$binaryMetadata.get(this.#filename)
+        if(!binary){
+            
+            let modCache = this.#kawix.$modCache.get(this.#filename)
+            //console.info("Here --->", modCache)
+            let mod = (modCache.module || {}).exports || {}
+            //let mod = await this.#kawix.import(this.#filename)    
+            binary = mod.__binary
+            if(binary){
+                Kawix.$binaryMetadata.set(this.#filename, binary)
+            }
+        }
+        return binary?.metadata
+    }
+
+
+    async getStream(name: string, options:any = {}){
+        
+        let metadata = await this.getMetadata()
+        if(metadata){
+            let binary = Kawix.$binaryMetadata.get(this.#filename)
+            let meta = metadata[name]
+            if(meta){
+                //console.info("Binary:", binary)
+                let boffset = meta.offset + binary.length +  binary.start
+                let start = (options.start || 0) + boffset
+                let end = boffset + meta.length - 1
+                if(options.length !== undefined){
+                    end = Math.min(options.length + start - 1, end)
+                }
+                if(options.end) end = options.end
+                return Fs.createReadStream(binary.filename, {
+                    start,
+                    end
+                })
+            }
+        }
+    }
+
+
+    async read(name: string, offset: number = 0, count? : number){
+        
+        
+        let metadata = await this.getMetadata()
+        if(metadata){
+            let binary = Kawix.$binaryMetadata.get(this.#filename)
+            let meta = metadata[name]
+            if(meta){
+                let boffset = meta.offset + binary.start
+                let fd = binary.fd || 0, buffer = null
+                try{
+                    if(!fd){
+                        fd = await new Promise<number>(function(a,b){
+                            Fs.open(binary.filename, "r", function(er, fd){
+                                if(er) return b(er)
+                                return a(fd)
+                            })
+                        })
+                        if(Os.platform() != "win32")
+                            binary.fd = fd 
+                    }
+                    if(count == undefined) count = meta.length
+                    let len = Math.min(meta.length, count)
+                    buffer = Buffer.allocUnsafe(len)
+                    await new Promise(function(a,b){
+                        Fs.read(fd, buffer, 0, buffer.length, boffset + offset, function(er, fd){
+                            if(er) return b(er)
+                            return a(fd)
+                        })
+                    })
+                }catch(e){
+                    throw e
+                }finally{
+                    if(fd && (Os.platform() == "win32")){
+                        await new Promise<void>(function(a,b){
+                            Fs.close(fd, function(er){
+                                if(er) return b(er)
+                                return a()
+                            })
+                        })
+                    }
+                }
+                return buffer
+            }
+        }
+    }
+}
+
+
 export class Kawix{
 
     appArguments: string[] = []
@@ -1155,6 +1256,7 @@ export class Kawix{
     originalArgv: string[]
 
     static $binaryMetadata = new Map<string, any>()
+    static $binaryFiles = new Map<string, any>()
 
     $importing = new Map<string, any>() 
     $modCache = new Map<string, any>()
@@ -1164,6 +1266,9 @@ export class Kawix{
     $installer: Installer
     $originals = new Map<string, any>()
     $startParams:any = {}
+
+
+    
 
     get argv():string[]{
         return this.appArguments
@@ -1424,59 +1529,19 @@ export class Kawix{
 
     }
 
-    async getBinary(filename: string, name: string, offset: number = 0, count? : number){
-        
-        //console.info("Data:", data)
-        let binary = Kawix.$binaryMetadata.get(filename)
-        if(!binary){
-            let mod = await this.import(filename)    
-            binary = mod.__binary
-            if(binary){
-                Kawix.$binaryMetadata.set(filename, binary)
-            }
-        }
-        if(binary){
-            
-            let meta = binary.metadata[name]
-            if(meta){
-                let boffset = meta.offset + binary.offset
-                let fd = binary.fd || 0, buffer = null
-                try{
-                    if(!fd){
-                        fd = await new Promise<number>(function(a,b){
-                            Fs.open(binary.filename, "r", function(er, fd){
-                                if(er) return b(er)
-                                return a(fd)
-                            })
-                        })
-                        if(Os.platform() != "win32")
-                            binary.fd = fd 
-                    }
-                    if(count == undefined) count = meta.length
-                    let len = Math.min(meta.length, count)
-                    buffer = Buffer.allocUnsafe(len)
-                    await new Promise(function(a,b){
-                        Fs.read(fd, buffer, 0, buffer.length, boffset + offset, function(er, fd){
-                            if(er) return b(er)
-                            return a(fd)
-                        })
-                    })
-                }catch(e){
-                    throw e
-                }finally{
-                    if(fd && (Os.platform() == "win32")){
-                        await new Promise<void>(function(a,b){
-                            Fs.close(fd, function(er){
-                                if(er) return b(er)
-                                return a()
-                            })
-                        })
-                    }
+
+    
+    $generateRequireSync(parent){
+        let req = (path)=> this.requireSync(path, parent, require)
+        for(let id in require){
+            Object.defineProperty(req, id, {
+                get(){
+                    return require[id]
                 }
-                return buffer
-            }
+            })
         }
-    }    
+        return req
+    }
 
     requireSync(request, parent, originalRequire = null){
 
@@ -1512,7 +1577,7 @@ export class Kawix{
                     content: file.content.toString()
                 }
                 if(file.transpiled){
-                    mod1["requireSync"] = (path)=> this.requireSync(path, mod1)
+                    mod1["requireSync"] =  this.$generateRequireSync(mod1) // (path)=> this.requireSync(path, mod1)
                     let content = `require = module.requireSync;${source.content}`
                     mod1["_compile"](content, name)
                     cached = {
@@ -1567,6 +1632,14 @@ export class Kawix{
         if(cached)
             this.$modCache.set(resolv.request, cached)
         return exports
+    }
+
+    getBinary(filename: string){
+        let bin = Kawix.$binaryFiles.get(filename)
+        if(!bin){
+            bin = new BinaryData(this, filename)
+        }
+        return bin
     }
 
 
@@ -1762,7 +1835,7 @@ export class Kawix{
             }
             else if(!info.executed){
                 // compile 
-                info.module["requireSync"] = (path)=> this.requireSync(path, info.module)
+                info.module["requireSync"] = this.$generateRequireSync(info.module) // (path)=> this.requireSync(path, info.module)
                 info.module["_compile"](info.result.code, info.filename)
                 return info.exports = info.module.exports
             }
@@ -2189,7 +2262,7 @@ export class Kawix{
         let kmodule = data.__local__vars["KModule"] = new KModule(module)
         data.__local__vars["asyncRequire"] = kmodule.import.bind(kmodule)        
         //let originalRequire = data.__local__vars["require"]
-        data.__local__vars["require"] = (request)=> this.requireSync(request, module) 
+        data.__local__vars["require"] = this.$generateRequireSync(module) //(request)=> this.requireSync(request, module) 
         let keys = Object.keys(data.__local__vars)
         let values = Object.values(data.__local__vars)
         values.push(data)
@@ -2367,7 +2440,7 @@ export class Kawix{
 
 
 // register .ts, .js extension
-
+let Zlib = null
 async function BinaryTypescript(filename: string, module: Module, options: any): Promise<CompiledResult>{
     let fd = Fs.openSync(filename, "r")
     let buffer = Buffer.allocUnsafe(500)
@@ -2387,22 +2460,50 @@ async function BinaryTypescript(filename: string, module: Module, options: any):
     
     buffer = Buffer.allocUnsafe(sourceLen)
     Fs.readSync(fd, buffer, 0, buffer.length, offset)
-    let source = buffer.toString()
+    
+
+    let compressType = bytes.slice(8,9).toString()
+    let getString = function(buffer){
+        if(compressType == "g"){
+            if(!Zlib) Zlib = require("zlib")
+            buffer = Zlib.gunzipSync(buffer)
+        }
+        else if(compressType == "z"){
+            if(!Zlib) Zlib = require("zlib")
+            buffer = Zlib.inflateSync(buffer)
+        }
+        else if(compressType == "b"){
+            if(!Zlib) Zlib = require("zlib")
+            buffer = Zlib.brotliDecompressSync(buffer)
+        }
+        else{
+            buffer = buffer.toString()
+        }
+        return buffer
+    }
+
+    let source = getString(buffer)
 
     offset += sourceLen + 1
     buffer = Buffer.allocUnsafe(binaryMetaLen)
     Fs.readSync(fd, buffer, 0, buffer.length, offset)
-    //console.info(binaryMetaLen, buffer.toString())
-    let metadata = JSON.parse(buffer.toString())
+
+    let metadata = JSON.parse(getString(buffer))
     let binary= {
         metadata,
         start: offset,
-        length: 0,
-        filename
+        length: binaryMetaLen,
+        data: {
+            offset: 0,
+            length: 0
+        },
+        filename,
+        
     }
+    binary.data.offset = binary.start + binaryMetaLen
     let stat = Fs.fstatSync(fd)
-    binary.length = stat.size - binary.start
-    source += `\n;exports.__binary = ${JSON.stringify(binary)}`
+    binary.data.length = stat.size - binary.data.offset
+    source = `exports.__binary = ${JSON.stringify(binary)};\n${source}`
 
     let cmeta = Kawix.$binaryMetadata.get(filename)
     if(cmeta?.fd){
@@ -2445,6 +2546,10 @@ KModule.addExtensionLoader(".ts", {
 })
 
 KModule.addExtensionLoader(".kwb", {
+    compile: BinaryTypescript
+})
+
+KModule.addExtensionLoader(".kwc", {
     compile: BinaryTypescript
 })
 

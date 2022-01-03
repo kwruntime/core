@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Kawix = exports.Installer = exports.KModule = void 0;
+exports.Kawix = exports.BinaryData = exports.Installer = exports.KModule = void 0;
 
 var _fs = _interopRequireDefault(require("fs"));
 
@@ -20,6 +20,16 @@ var _http = _interopRequireDefault(require("http"));
 var _https = _interopRequireDefault(require("https"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classPrivateFieldGet(receiver, privateMap) { var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get"); return _classApplyDescriptorGet(receiver, descriptor); }
+
+function _classApplyDescriptorGet(receiver, descriptor) { if (descriptor.get) { return descriptor.get.call(receiver); } return descriptor.value; }
+
+function _classPrivateFieldSet(receiver, privateMap, value) { var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "set"); _classApplyDescriptorSet(receiver, descriptor, value); return value; }
+
+function _classExtractFieldDescriptor(receiver, privateMap, action) { if (!privateMap.has(receiver)) { throw new TypeError("attempted to " + action + " private field on non-instance"); } return privateMap.get(receiver); }
+
+function _classApplyDescriptorSet(receiver, descriptor, value) { if (descriptor.set) { descriptor.set.call(receiver, value); } else { if (!descriptor.writable) { throw new TypeError("attempted to set read only private field"); } descriptor.value = value; } }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -606,13 +616,13 @@ Comment= `;
     await this.setExtensions({
       type: "application/kwruntime.script",
       description: "Script de Kawix Runtime",
-      extensions: [".kws", ".kw.ts"],
+      extensions: [".kws", ".kw.ts", ".kwc"],
       terminal: true
     });
     await this.setExtensions({
       type: "application/kwruntime.app",
       description: "Aplicación de Kawix Runtime",
-      extensions: [".kwr"],
+      extensions: [".kwr", ".kwb"],
       terminal: false
     });
     await this.setExtensions({
@@ -1110,13 +1120,13 @@ Comment= `;
     await this.setExtensions({
       type: "application/kwruntime.script",
       description: "Script de Kawix Runtime",
-      extensions: [".kws", ".kw.ts"],
+      extensions: [".kws", ".kw.ts", ".kwc"],
       terminal: true
     });
     await this.setExtensions({
       type: "application/kwruntime.app",
       description: "Aplicación de Kawix Runtime",
-      extensions: [".kwr"],
+      extensions: [".kwr", ".kwb"],
       terminal: false
     });
     await this.setExtensions({
@@ -1131,6 +1141,128 @@ Comment= `;
 }
 
 exports.Installer = Installer;
+
+var _kawix = /*#__PURE__*/new WeakMap();
+
+var _filename = /*#__PURE__*/new WeakMap();
+
+class BinaryData {
+  constructor(kawix, filename) {
+    _kawix.set(this, {
+      writable: true,
+      value: void 0
+    });
+
+    _filename.set(this, {
+      writable: true,
+      value: void 0
+    });
+
+    _classPrivateFieldSet(this, _kawix, kawix);
+
+    _classPrivateFieldSet(this, _filename, filename);
+  }
+
+  async getMetadata() {
+    var _binary;
+
+    let binary = Kawix.$binaryMetadata.get(_classPrivateFieldGet(this, _filename));
+
+    if (!binary) {
+      let modCache = _classPrivateFieldGet(this, _kawix).$modCache.get(_classPrivateFieldGet(this, _filename)); //console.info("Here --->", modCache)
+
+
+      let mod = (modCache.module || {}).exports || {}; //let mod = await this.#kawix.import(this.#filename)    
+
+      binary = mod.__binary;
+
+      if (binary) {
+        Kawix.$binaryMetadata.set(_classPrivateFieldGet(this, _filename), binary);
+      }
+    }
+
+    return (_binary = binary) === null || _binary === void 0 ? void 0 : _binary.metadata;
+  }
+
+  async getStream(name, options = {}) {
+    let metadata = await this.getMetadata();
+
+    if (metadata) {
+      let binary = Kawix.$binaryMetadata.get(_classPrivateFieldGet(this, _filename));
+      let meta = metadata[name];
+
+      if (meta) {
+        //console.info("Binary:", binary)
+        let boffset = meta.offset + binary.length + binary.start;
+        let start = (options.start || 0) + boffset;
+        let end = boffset + meta.length - 1;
+
+        if (options.length !== undefined) {
+          end = Math.min(options.length + start - 1, end);
+        }
+
+        if (options.end) end = options.end;
+        return _fs.default.createReadStream(binary.filename, {
+          start,
+          end
+        });
+      }
+    }
+  }
+
+  async read(name, offset = 0, count) {
+    let metadata = await this.getMetadata();
+
+    if (metadata) {
+      let binary = Kawix.$binaryMetadata.get(_classPrivateFieldGet(this, _filename));
+      let meta = metadata[name];
+
+      if (meta) {
+        let boffset = meta.offset + binary.start;
+        let fd = binary.fd || 0,
+            buffer = null;
+
+        try {
+          if (!fd) {
+            fd = await new Promise(function (a, b) {
+              _fs.default.open(binary.filename, "r", function (er, fd) {
+                if (er) return b(er);
+                return a(fd);
+              });
+            });
+            if (_os.default.platform() != "win32") binary.fd = fd;
+          }
+
+          if (count == undefined) count = meta.length;
+          let len = Math.min(meta.length, count);
+          buffer = Buffer.allocUnsafe(len);
+          await new Promise(function (a, b) {
+            _fs.default.read(fd, buffer, 0, buffer.length, boffset + offset, function (er, fd) {
+              if (er) return b(er);
+              return a(fd);
+            });
+          });
+        } catch (e) {
+          throw e;
+        } finally {
+          if (fd && _os.default.platform() == "win32") {
+            await new Promise(function (a, b) {
+              _fs.default.close(fd, function (er) {
+                if (er) return b(er);
+                return a();
+              });
+            });
+          }
+        }
+
+        return buffer;
+      }
+    }
+  }
+
+}
+
+exports.BinaryData = BinaryData;
 
 class Kawix {
   constructor() {
@@ -1423,63 +1555,19 @@ class Kawix {
     if (error) throw error;
   }
 
-  async getBinary(filename, name, offset = 0, count) {
-    //console.info("Data:", data)
-    let binary = Kawix.$binaryMetadata.get(filename);
+  $generateRequireSync(parent) {
+    let req = path => this.requireSync(path, parent, require);
 
-    if (!binary) {
-      let mod = await this.import(filename);
-      binary = mod.__binary;
-
-      if (binary) {
-        Kawix.$binaryMetadata.set(filename, binary);
-      }
-    }
-
-    if (binary) {
-      let meta = binary.metadata[name];
-
-      if (meta) {
-        let boffset = meta.offset + binary.offset;
-        let fd = binary.fd || 0,
-            buffer = null;
-
-        try {
-          if (!fd) {
-            fd = await new Promise(function (a, b) {
-              _fs.default.open(binary.filename, "r", function (er, fd) {
-                if (er) return b(er);
-                return a(fd);
-              });
-            });
-            if (_os.default.platform() != "win32") binary.fd = fd;
-          }
-
-          if (count == undefined) count = meta.length;
-          let len = Math.min(meta.length, count);
-          buffer = Buffer.allocUnsafe(len);
-          await new Promise(function (a, b) {
-            _fs.default.read(fd, buffer, 0, buffer.length, boffset + offset, function (er, fd) {
-              if (er) return b(er);
-              return a(fd);
-            });
-          });
-        } catch (e) {
-          throw e;
-        } finally {
-          if (fd && _os.default.platform() == "win32") {
-            await new Promise(function (a, b) {
-              _fs.default.close(fd, function (er) {
-                if (er) return b(er);
-                return a();
-              });
-            });
-          }
+    for (let id in require) {
+      Object.defineProperty(req, id, {
+        get() {
+          return require[id];
         }
 
-        return buffer;
-      }
+      });
     }
+
+    return req;
   }
 
   requireSync(request, parent, originalRequire = null) {
@@ -1510,7 +1598,7 @@ class Kawix {
         };
 
         if (file.transpiled) {
-          mod1["requireSync"] = path => this.requireSync(path, mod1);
+          mod1["requireSync"] = this.$generateRequireSync(mod1); // (path)=> this.requireSync(path, mod1)
 
           let content = `require = module.requireSync;${source.content}`;
           mod1["_compile"](content, name);
@@ -1564,6 +1652,16 @@ class Kawix {
     let exports = getExports();
     if (cached) this.$modCache.set(resolv.request, cached);
     return exports;
+  }
+
+  getBinary(filename) {
+    let bin = Kawix.$binaryFiles.get(filename);
+
+    if (!bin) {
+      bin = new BinaryData(this, filename);
+    }
+
+    return bin;
   }
 
   importResolve(request, parent = null, syncMode = false) {
@@ -1738,7 +1836,7 @@ class Kawix {
         return require(info.location.main);
       } else if (!info.executed) {
         // compile 
-        info.module["requireSync"] = path => this.requireSync(path, info.module);
+        info.module["requireSync"] = this.$generateRequireSync(info.module); // (path)=> this.requireSync(path, info.module)
 
         info.module["_compile"](info.result.code, info.filename);
         return info.exports = info.module.exports;
@@ -2138,7 +2236,7 @@ class Kawix {
     let kmodule = data.__local__vars["KModule"] = new KModule(module);
     data.__local__vars["asyncRequire"] = kmodule.import.bind(kmodule); //let originalRequire = data.__local__vars["require"]
 
-    data.__local__vars["require"] = request => this.requireSync(request, module);
+    data.__local__vars["require"] = this.$generateRequireSync(module); //(request)=> this.requireSync(request, module) 
 
     let keys = Object.keys(data.__local__vars);
     let values = Object.values(data.__local__vars);
@@ -2302,6 +2400,10 @@ exports.Kawix = Kawix;
 
 _defineProperty(Kawix, "$binaryMetadata", new Map());
 
+_defineProperty(Kawix, "$binaryFiles", new Map());
+
+let Zlib = null;
+
 async function BinaryTypescript(filename, module, options) {
   let fd = _fs.default.openSync(filename, "r");
 
@@ -2327,25 +2429,48 @@ async function BinaryTypescript(filename, module, options) {
 
   _fs.default.readSync(fd, buffer, 0, buffer.length, offset);
 
-  let source = buffer.toString();
+  let compressType = bytes.slice(8, 9).toString();
+
+  let getString = function (buffer) {
+    if (compressType == "g") {
+      if (!Zlib) Zlib = require("zlib");
+      buffer = Zlib.gunzipSync(buffer);
+    } else if (compressType == "z") {
+      if (!Zlib) Zlib = require("zlib");
+      buffer = Zlib.inflateSync(buffer);
+    } else if (compressType == "b") {
+      if (!Zlib) Zlib = require("zlib");
+      buffer = Zlib.brotliDecompressSync(buffer);
+    } else {
+      buffer = buffer.toString();
+    }
+
+    return buffer;
+  };
+
+  let source = getString(buffer);
   offset += sourceLen + 1;
   buffer = Buffer.allocUnsafe(binaryMetaLen);
 
-  _fs.default.readSync(fd, buffer, 0, buffer.length, offset); //console.info(binaryMetaLen, buffer.toString())
+  _fs.default.readSync(fd, buffer, 0, buffer.length, offset);
 
-
-  let metadata = JSON.parse(buffer.toString());
+  let metadata = JSON.parse(getString(buffer));
   let binary = {
     metadata,
     start: offset,
-    length: 0,
+    length: binaryMetaLen,
+    data: {
+      offset: 0,
+      length: 0
+    },
     filename
   };
+  binary.data.offset = binary.start + binaryMetaLen;
 
   let stat = _fs.default.fstatSync(fd);
 
-  binary.length = stat.size - binary.start;
-  source += `\n;exports.__binary = ${JSON.stringify(binary)}`;
+  binary.data.length = stat.size - binary.data.offset;
+  source = `exports.__binary = ${JSON.stringify(binary)};\n${source}`;
   let cmeta = Kawix.$binaryMetadata.get(filename);
 
   if (cmeta !== null && cmeta !== void 0 && cmeta.fd) {
@@ -2388,6 +2513,9 @@ KModule.addExtensionLoader(".ts", {
   compile: Typescript
 });
 KModule.addExtensionLoader(".kwb", {
+  compile: BinaryTypescript
+});
+KModule.addExtensionLoader(".kwc", {
   compile: BinaryTypescript
 });
 let defaultJs = _module.default["_extensions"][".js"];
