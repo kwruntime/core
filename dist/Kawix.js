@@ -2161,7 +2161,8 @@ class Kawix {
 
     let aliases = {};
     let head_i = result.code.indexOf(b),
-        z = 0;
+        z = 0,
+        changed = false;
     if (head_i < 0) head_i = result.code.length;
 
     if (head_i >= 0) {
@@ -2174,6 +2175,7 @@ class Kawix {
         if (line.indexOf("require(\"") >= 0) {
           let mod = line.match(/require\(\"([^\"]+)\"\)/)[1],
               alias = '';
+          console.info("LINE...", line, mod);
           let i = mod.indexOf("##");
 
           if (i > 0) {
@@ -2181,6 +2183,8 @@ class Kawix {
             mod = mod.substring(0, i);
             aliases[alias] = z;
           }
+
+          changed = true;
 
           if (aliases[mod] !== undefined) {
             line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + aliases[mod] + "]");
@@ -2199,7 +2203,7 @@ class Kawix {
       }
     }
 
-    if (requires.length > 0) {
+    if (changed) {
       result.code = nhead.join("\n") + result.code.substring(head_i);
     }
 
