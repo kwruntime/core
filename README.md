@@ -127,7 +127,7 @@ const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
 2022-01-04
 ```
 
-    NOTE: When you import URLs the content is cached on disk. For this reason is preferrable when you import,  specify an URL containing version, tag, or commit. 
+**NOTE**: When you import URLs the content is cached on disk. For this reason is preferrable when you import,  specify an URL containing version, tag, or commit. 
 
 
 
