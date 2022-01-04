@@ -38,7 +38,7 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/node.sh | bash
 
 * Windows 
 
-Installer coming soon ...
+Installer autoupdated 32/64 bits: [https://github.com/kwruntime/core/releases/tag/win32-installer](https://github.com/kwruntime/core/releases/tag/win32-installer)
 
 * Install from git in any node supported platform (Linux, Mac, Windows, Android, etc)
 
