@@ -2126,7 +2126,6 @@ export class Kawix{
                 if(line.indexOf("require(\"") >= 0){
                     
                     let mod = line.match(/require\(\"([^\"]+)\"\)/)[1], alias = ''
-                    console.info("LINE...", line, mod)
                     let i = mod.indexOf("##")
                     if(i > 0){
                         alias = mod.substring(i+2)
