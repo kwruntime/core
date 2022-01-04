@@ -2,6 +2,21 @@
     "name": "@kwruntime/core",
     "version": "1.1.9",
     "main": "index.js",
+    "keywords": [
+        "loader",
+        "transpiler",
+        "module",
+        "next",
+        "ecmascript",
+        "async",
+        "import",
+        "kawix",
+        "kodhe",
+        "kwruntime",
+        "es2020",
+        "esnext",
+        "typescript"
+    ],
     "scripts":{
         "install": "node cli --self-install"
     },
