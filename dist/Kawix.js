@@ -2148,16 +2148,23 @@ class Kawix {
       fname += ".ts"; // for correct transformation
     }
 
-    result = global.Babel.transform(b + source, {
-      filename: fname,
-      "plugins": Object.values(global.BabelPlugins).concat(options.plugins || []),
-      presets: [[global.Babel.availablePresets["env"], {
-        "targets": {
-          node: 8
-        }
-      }], global.Babel.availablePresets["typescript"]],
-      compact: false
-    }); // get imports 
+    if (source.indexOf("\n//KWRUNTIME-DISABLE-TRANSPILATION\n") >= 0) {
+      result = {
+        code: b + source
+      };
+    } else {
+      result = global.Babel.transform(b + source, {
+        filename: fname,
+        "plugins": Object.values(global.BabelPlugins).concat(options.plugins || []),
+        presets: [[global.Babel.availablePresets["env"], {
+          "targets": {
+            node: 8
+          }
+        }], global.Babel.availablePresets["typescript"]],
+        compact: false
+      });
+    } // get imports 
+
 
     let aliases = {};
     let head_i = result.code.indexOf(b),
