@@ -15,7 +15,9 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 ## Installation
 
-Here the options for install. In Android you can install using Termux  (please download Termux from F-Droid)
+There are many options for installing kwruntime. You can install in any nodejs supported platform: Linux, Windows, Mac, Android, etc.
+
+In Android you can install using Termux  (recommended Termux from F-Droid)
 
 
 * Linux (supported: ```x64, armv7, arm64```)
