@@ -14,8 +14,8 @@ global.BabelPlugins = {
 
 }
 
-var kawix = require("./Kawix.js").Kawix
-var kwcore = global.kwcore = global.kawix = new kawix()
+var Kawix = require("./Kawix.js").Kawix
+var kwcore = global.kwcore = global.kawix = new Kawix()
 //kwcore.winReg = require("./winreg-vbs1.0.0.js")
 kwcore.$init()
 
@@ -126,4 +126,10 @@ let program = async function(){
     }
 }
 
-program()
+exports.kwruntime = kwcore 
+exports.kawix = kwcore 
+exports.Kawix = Kawix 
+exports.program = exports.default = program 
+exports.programTimer = setImmediate(program)
+
+//program()

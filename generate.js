@@ -1,18 +1,3 @@
-/*import 'npm://esbuild@0.12.15'
-import * as esbuild from "esbuild"
-
-main()
-async function main(){
-
-    esbuild.buildSync({
-        entryPoints: [__dirname + '/src/index.js'],
-        bundle: true,
-        platform: 'node',
-        target: ['node10.4'],
-        outfile: __dirname + '/dist/kwruntime.js'
-    })
-}*/
-
 var fs = require("fs")
 global.Babel = require("./src/lib/babel.min.js")
 

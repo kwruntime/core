@@ -1,5 +1,11 @@
 {
-    "name": "kwruntime",
-    "version": "1.1.8",
-    "main": "dist/kwruntime.js"
+    "name": "@kwruntime/core",
+    "version": "1.1.9",
+    "main": "index.js",
+    "scripts":{
+        "install": "node cli --self-install"
+    },
+    "bin": {
+        "kwrun": "node cli"
+    }
 }
