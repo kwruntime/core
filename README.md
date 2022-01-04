@@ -115,6 +115,7 @@ async function main(){
 ```typescript
 import * as Luxon from "https://esm.sh/luxon@2.3.0"
 const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
+console.info(date)
 ``` 
 
    you will get a output like this:
@@ -129,7 +130,24 @@ const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
 
 **NOTE**: When you import URLs the content is cached on disk. For this reason is preferrable when you import,  specify an URL containing version, tag, or commit. 
 
+## Using from Node.js
 
+```javascript
+const {kwruntime} = require("@kwruntime/core")
+kwruntime.import("github://kwruntime/std@808cb57/util/hello.ts")
+```
+
+```javascript
+const {kwruntime} = require("@kwruntime/core")
+
+async function main(){
+    const Luxon = await kwruntime.import("https://esm.sh/luxon@2.3.0")
+    const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
+    console.info(date)
+}
+
+
+```
 
 
 ## Plugin for VSCode
