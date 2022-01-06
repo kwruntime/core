@@ -1,6 +1,6 @@
 {
     "name": "@kwruntime/core",
-    "version": "1.1.9",
+    "version": "1.1.14",
     "main": "index.js",
     "keywords": [
         "loader",
@@ -18,12 +18,22 @@
         "typescript"
     ],
     "scripts":{
-        "install": "node cli --self-install"
+        "global-install": "node cli.js --self-install"
     },
     "bin": {
-        "kwrun": "node cli"
+        "kwrun": "./cli.js"
     },
     "engines" : {
-        "node" : ">=14"
-    }
+        "node" : ">=12"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kwruntime/core.git"
+    },
+        "author": "Kodhe <developer@kodhe.com>",
+        "license": "MIT",
+        "bugs": {
+        "url": "https://github.com/kwruntime/core/issues"
+    },
+    "homepage": "https://github.com/kwruntime/core#readme"
 }

@@ -1188,7 +1188,10 @@ export class Kawix{
     static $binaryMetadata = new Map<string, any>()
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
-
+    static packageLoaders = {
+        "yarn": "github://kwruntime/std@1.1.13/package/yarn.ts",
+        "pnpm": "github://kwruntime/std@1.1.13/package/pnpm.ts"
+    }
 
     $importing = new Map<string, any>() 
     $modCache = new Map<string, any>()
@@ -1199,6 +1202,11 @@ export class Kawix{
     $originals = new Map<string, any>()
     $startParams:any = {}
 
+    // now using pnpm as default loader
+    packageLoader: string = Kawix.packageLoaders["pnpm"]
+    get $class(){
+        return Kawix
+    }
 
     get argv():string[]{
         return this.appArguments
@@ -2148,7 +2156,7 @@ export class Kawix{
                         
                         if(/kwruntime\/core(\@[0-9\.A-Za-z]+)?\/src\/kwruntime(\.ts)?$/.test(mod)){
                             // Internal module
-                            line = line.replace(/require\(\"([^\"]+)\"\)/, "{KModule:KModule, kawix: global.kawix}")
+                            line = line.replace(/require\(\"([^\"]+)\"\)/, "{Kawix: global.kawix.$class, KModule:KModule, kawix: global.kawix}")
                         }
                         else{
                             requires.push(mod)

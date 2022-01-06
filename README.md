@@ -59,14 +59,13 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/node.sh | bash
 
 ```bash
 npm install -g @kwruntime/core
-
+kwrun --self-install
 # or 
-
 yarn global add @kwruntime/core
-
-# or 
-
+kwrun --self-install
+# or
 pnpm add @kwruntime --global
+kwrun --self-install
 ```
 
 * Execute without install 

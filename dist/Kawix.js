@@ -1280,6 +1280,12 @@ class Kawix {
     _defineProperty(this, "$originals", new Map());
 
     _defineProperty(this, "$startParams", {});
+
+    _defineProperty(this, "packageLoader", Kawix.packageLoaders["pnpm"]);
+  }
+
+  get $class() {
+    return Kawix;
   }
 
   get argv() {
@@ -2197,7 +2203,7 @@ class Kawix {
           } else {
             if (/kwruntime\/core(\@[0-9\.A-Za-z]+)?\/src\/kwruntime(\.ts)?$/.test(mod)) {
               // Internal module
-              line = line.replace(/require\(\"([^\"]+)\"\)/, "{KModule:KModule, kawix: global.kawix}");
+              line = line.replace(/require\(\"([^\"]+)\"\)/, "{Kawix: global.kawix.$class, KModule:KModule, kawix: global.kawix}");
             } else {
               requires.push(mod);
               line = line.replace(/require\(\"([^\"]+)\"\)/, "preloadedModules[" + String(z++) + "]");
@@ -2443,6 +2449,11 @@ _defineProperty(Kawix, "$binaryMetadata", new Map());
 _defineProperty(Kawix, "$binaryFiles", new Map());
 
 _defineProperty(Kawix, "$modulesData", new Map());
+
+_defineProperty(Kawix, "packageLoaders", {
+  "yarn": "github://kwruntime/std@1.1.13/package/yarn.ts",
+  "pnpm": "github://kwruntime/std@1.1.13/package/pnpm.ts"
+});
 
 let Zlib = null;
 
