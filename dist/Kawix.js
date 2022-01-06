@@ -302,14 +302,18 @@ class Installer {
 
     let iconPath = _path.default.join(paths.mainIcon, "kwruntimeapp.svg");
 
+    let siconPath = _path.default.join(paths.icon, "kwruntimeapp.svg");
+
     _fs.default.writeFileSync(iconPath, this.$kawix.svgIcon);
 
+    if (_fs.default.existsSync(siconPath)) _fs.default.unlinkSync(siconPath);
+    await _fs.default.promises.symlink(iconPath, siconPath);
     let er = null;
 
     try {
       // this works on ubuntu
       await new Promise(function (resolve, reject) {
-        let p = require("child_process").spawn("update-icon-caches", [paths.mainIcon]);
+        let p = require("child_process").spawn("update-icon-caches", [paths.mainIcon, _path.default.join(paths.icon, "hicolor")]);
 
         p.on("error", reject);
         p.on("exit", resolve);
@@ -322,7 +326,7 @@ class Installer {
       try {
         // this works on opensuse and maybe others
         await new Promise(function (resolve, reject) {
-          let p = require("child_process").spawn("gtk-update-icon-cache", [paths.mainIcon]);
+          let p = require("child_process").spawn("gtk-update-icon-cache", [paths.mainIcon, _path.default.join(paths.icon, "hicolor")]);
 
           p.on("error", reject);
           p.on("exit", resolve);
@@ -2062,7 +2066,7 @@ class Kawix {
       conv = await this.$getNetworkContent(req);
     } else if (resolv.request.startsWith("npm://")) {
       let name = resolv.request.substring(6);
-      let mod = await this.import("github://kwruntime/std@1.1.4/package/yarn.ts", null, scope);
+      let mod = await this.import(this.packageLoader, null, scope);
       let reg = new mod.Registry();
       let items = await reg.resolve(name);
       if (!(items instanceof Array)) items = [items]; //return await reg.require(name)
