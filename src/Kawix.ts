@@ -1194,7 +1194,7 @@ export class Kawix{
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
         "yarn": "github://kwruntime/std@1.1.13/package/yarn.ts",
-        "pnpm": "github://kwruntime/std@1.1.13/package/pnpm.ts"
+        "pnpm": "github://kwruntime/std@69ec386/package/pnpm.ts"
     }
 
     $importing = new Map<string, any>() 
