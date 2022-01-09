@@ -21,11 +21,11 @@
         "files": [
             {
                 "path": "runtime/Kawix.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js"
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/Kawix.js"
             },
             {
                 "path": "runtime/kwruntime.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/kwruntime.js"
             },
             {
                 "path": "runtime/winreg-vbs.tar.gz",
@@ -69,11 +69,11 @@
         "files": [
             {
                 "path": "runtime/Kawix.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js"
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/Kawix.js"
             },
             {
                 "path": "runtime/kwruntime.js",
-                "href": "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js"
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/kwruntime.js"
             }
         ]
     }

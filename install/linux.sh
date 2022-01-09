@@ -74,7 +74,7 @@ else
 fi
 
 
-curl -L "https://raw.githubusercontent.com/kwruntime/core/main/dist/kwruntime.js" -o "$_HOME/src/kwruntime.js"
-curl -L "https://raw.githubusercontent.com/kwruntime/core/main/dist/Kawix.js" -o "$_HOME/src/Kawix.js"
+curl -L "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/kwruntime.js" -o "$_HOME/src/kwruntime.js"
+curl -L "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/Kawix.js" -o "$_HOME/src/Kawix.js"
 
 "$_HOME/bin/node" "$_HOME/src/kwruntime.js" --self-install 
