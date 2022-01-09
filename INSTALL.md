@@ -8,7 +8,7 @@ In Android you can install using Termux  (recommended Termux from F-Droid)
 * Linux (supported: ```x64, armv7, arm64```)
 
 ```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/linux.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/linux.sh | bash
 ``` 
 
 * Windows 
@@ -19,7 +19,7 @@ Installer 32/64 bits: [https://github.com/kwruntime/core/releases/tag/win32-inst
 * Android (with Termux)
 
 ```bash 
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@a60e7b8/install/android.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/android.sh | bash
 ```
 
 * Linux, Mac, Android with ```nodejs``` (please version 12 or higher)
@@ -28,7 +28,7 @@ Prerequisites:  Install nodejs from [https://nodejs.org/es/download/](https://no
 In Android Termux you can install using: ```pkg install nodejs-lts``` or ```pkg install nodejs```
 
 ```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@986e359/install/node.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/node.sh | bash
 ``` 
 
 
