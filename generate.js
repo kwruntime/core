@@ -44,5 +44,9 @@ require = function(name){
 
 ${fs.readFileSync(__dirname + "/src/index.js", "utf8")}
 `
+
+if(!fs.existsSync(__dirname + "/dist")){
+    fs.mkdirSync(__dirname + "/dist")
+}
 fs.writeFileSync(__dirname + "/dist/kwruntime.js", text)
 fs.writeFileSync(__dirname + "/dist/Kawix.js", result.code)
