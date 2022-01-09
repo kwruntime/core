@@ -60,7 +60,7 @@ kwruntime.import("github://kwruntime/std@808cb57/util/hello.ts")
 
 ```javascript
 const {kwruntime} = require("@kwruntime/core")
-
+main()
 async function main(){
     const Luxon = await kwruntime.import("https://esm.sh/luxon@2.3.0")
     const date = Luxon.DateTime.now().toFormat("yyyy-MM-dd")
