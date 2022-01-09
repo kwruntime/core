@@ -37,6 +37,7 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/node.sh | bash
 ```bash 
 > git clone https://github.com/kwruntime/core kwruntime
 > cd kwruntime
+> node generate
 > node index --self-install
 ```
 
