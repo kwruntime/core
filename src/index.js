@@ -23,9 +23,21 @@ kwcore.$init()
 let program = async function(){
     try{
 
-        //console.info(kwcore.$startParams)
+        if(kwcore.$startParams["transpiler"] == "esbuild"){
+            await kwcore.$enableEsbuildTranspiler()
+        }
+        else if(kwcore.$startParams["transpiler"]){
+            kwcore.transpiler = kwcore.$startParams["transpiler"]
+        }
+
+
+
         if(kwcore.$startParams["self-install"] !== undefined){
             await kwcore.installer.selfInstall()
+        }
+        else if(kwcore.$startParams["install-esbuild"] !== undefined){
+            await kwcore.$installEsbuild(kwcore.$startParams["install-esbuild"])
+            console.info("> Esbuild transpiler installed. Now you can use with --transpiler=esbuild")
         }
         else if(kwcore.$startParams["install-kwcore"] !== undefined){
             await kwcore.installer.installKwcore()
@@ -118,8 +130,9 @@ let program = async function(){
                     await mod.Program.main(global.kwcore.appArguments)
                 }
             }
-
-
+        }
+        else{
+            console.info("Welcome to kwruntime/core version "+ kwcore.version)
         }
     }catch(e){
         console.error(e)

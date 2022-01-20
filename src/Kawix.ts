@@ -246,7 +246,16 @@ export class Installer{
             paths.mimeo = "/usr/share/mime"
         }
         else{
-            paths.mainIcon = Path.join(Os.homedir(), ".local/share/icons")
+            let local = paths.mainIcon = Path.join(Os.homedir(), ".local")
+            if(Fs.existsSync(local)){
+                Fs.mkdirSync(local)
+            }
+            local = Path.join(local, "share")
+            if(Fs.existsSync(local)){
+                Fs.mkdirSync(local)
+            }
+
+            paths.mainIcon = Path.join(local, "icons")
             if(!Fs.existsSync(paths.mainIcon)){
                 Fs.mkdirSync(paths.mainIcon)
             }
@@ -801,7 +810,12 @@ Comment= `
     async installKwcoreUnix(){
         let kawixFolder = Path.join(Os.homedir(), "KwRuntime")
         if(process.getuid() == 0){
-            if(!Fs.existsSync("/usr/KwRuntime")) Fs.mkdirSync("/usr/KwRuntime")
+            if(!Fs.existsSync("/usr/KwRuntime")){
+                Fs.mkdirSync("/usr/KwRuntime")
+            }
+            if(Fs.existsSync(kawixFolder)){
+                Fs.unlinkSync(kawixFolder)
+            }
             Fs.symlinkSync("/usr/KwRuntime", kawixFolder)
             kawixFolder = "/usr/KwRuntime"
         }
@@ -1189,6 +1203,10 @@ export class Kawix{
     optionsArguments: string[] = []
     originalArgv: string[]
 
+    transpiler = 'babel'
+    $esbuildTranspiler = null
+
+
     static $binaryMetadata = new Map<string, any>()
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
@@ -1217,7 +1235,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.8"
+        return "1.1.14"
     }
 
     get installer(){
@@ -1430,7 +1448,7 @@ export class Kawix{
                 }
             },function(res){
                 if(res.statusCode == 302){
-                    redir = res.headers.location
+                    redir = new URL(res.headers.location, url).href                    
                     return def.resolve()
                 }
 
@@ -1593,8 +1611,11 @@ export class Kawix{
         
         
         let exports = getExports()
-        if(cached)
+        if(cached){
+            if(cached)
+                cached.cacheTime = Date.now()
             this.$modCache.set(resolv.request, cached)
+        }
         return exports
     }
 
@@ -1773,6 +1794,22 @@ export class Kawix{
         }
 
         if(info.executed){
+            //console.info(info.module.exports, info)
+            if(info.module.exports?.kawixDynamic){
+                let time = info.module.exports?.kawixDynamic?.time || 15000
+                if(Date.now() > (info.cacheTime + time)){
+                    // check if file is edited ...
+                    let stat = Fs.statSync(info.filename)
+                    if(stat.mtimeMs > info.cacheTime){
+                        this.$modCache.delete(request)
+                        delete require.cache[info.filename]
+                        return null 
+                    }
+                    else{
+                        info.cacheTime = Date.now()
+                    }
+                }
+            }
             return {
                 data:info.module.exports
             }
@@ -1830,10 +1867,8 @@ export class Kawix{
    
 
     async import(request, parent = null, scope : Map<string, any> = null){
-
         let cache = this.$getCachedExports(request)
         if(cache) return cache.data
-
 
         let info = await this.importInfo(request, parent, scope)
         return await this.importFromInfo(info)
@@ -1887,6 +1922,7 @@ export class Kawix{
                 error = e 
             }
             if(result){
+                result.cacheTime = Date.now()
                 this.$modCache.set(resolv.request, result)
             }
 
@@ -2091,6 +2127,30 @@ export class Kawix{
         return cached.exports
     }*/
 
+    async $enableEsbuildTranspiler(){
+        let file = Path.join(this.$mainFolder, "esbuild.js")
+        if(!Fs.existsSync(file)){
+            await this.$installEsbuild()
+        }
+        this.$esbuildTranspiler = require(file)
+        this.transpiler = 'esbuild'
+    }
+
+
+    async $installEsbuild(version: string = 'latest'){
+        let id = parseInt(String(Date.now() / (24* 3600000))) + ".json"
+        
+        
+        let pack = await this.import("https://unpkg.com/esbuild@"+(version||'latest')+"/package.json?date=" + id)
+        version = pack.version 
+
+        let mod = await this.import(this.packageLoader)
+        let reg = new mod.Registry()
+        let desc = await reg.resolve("esbuild@" + version) 
+        let file = Path.join(this.$mainFolder, "esbuild.js")
+        Fs.writeFileSync(file, "module.exports = require("+JSON.stringify(desc.main)+")")
+        return file 
+    }
 
     
     async compileSource(source: string, options: any){
@@ -2112,8 +2172,8 @@ export class Kawix{
             if(source[0] == "\n") source = source.substring(1)
         }
 
-        
-        let b = "//KWCORE--STARTING--LINE\n"
+        //console.info("Using transpiler:", this.transpiler)
+        let b = "//KWCORE--STARTING--LINE\n", transpiled = ''
         let fname = options.filename
         if(!fname.endsWith(".ts")){
             fname += ".ts" // for correct transformation
@@ -2124,19 +2184,73 @@ export class Kawix{
             }
         }
         else{
-            result = global.Babel.transform(b + source, {
-                filename: fname,
-                "plugins": Object.values(global.BabelPlugins).concat(options.plugins || []),
-                presets: [[global.Babel.availablePresets["env"], {"targets": {node: 8}}], global.Babel.availablePresets["typescript"]],
-                compact: false,
-            })
+            if(this.transpiler == "babel"){
+                result = global.Babel.transform(b + source, {
+                    filename: fname,
+                    "plugins": Object.values(global.BabelPlugins).concat(options.plugins || []),
+                    presets: [[global.Babel.availablePresets["env"], {"targets": {node: 12}}], global.Babel.availablePresets["typescript"]],
+                    compact: false,
+                })
+                transpiled = 'babel'
+
+            }
+            else if(this.transpiler == "esbuild"){
+
+                b = "var $$$n_import = import.meta;" + b
+                let file = Path.join(this.$mainFolder, "esbuild.js")
+                if(!this.$esbuildTranspiler){
+                    try{
+                        this.$esbuildTranspiler = require(file)
+                    }catch(e){
+                        throw new Error("Please use 'kwrun --transpiler=esbuild' to enable esbuild transpiler")
+                    }
+                }
+                // async or sync??
+                //result = this.$esbuildTranspiler.transformSync(b + source, {
+                result = await this.$esbuildTranspiler.transform(b + source, {
+                    loader: 'ts',
+                    format:'cjs',
+                    target: 'node12'
+                })
+                transpiled = 'esbuild'
+
+            }
+            else{
+                throw new Error("Transpiler "+ this.transpiler + " not supported")
+            }
         }
 
         
         // get imports 
         let aliases = {}
         let head_i = result.code.indexOf(b), z = 0, changed = false 
-        if(head_i < 0) head_i = result.code.length
+
+        /*
+        if((head_i < 0) && (transpiled == "babel")){
+            head_i = result.code.indexOf("\nfunction _interopRequireDefault(")
+            if(head_i < 0)
+                head_i = result.code.indexOf("\nfunction _interopRequireWildcard(")
+        }*/
+
+        if((head_i < 0) && (transpiled == "esbuild")){
+            // some little transformations to match Babel transform code style
+            let find = "var $$$n_import = import_meta;"
+            head_i = result.code.indexOf(find)
+            let h = result.code.substring(0, head_i).replace("const import_meta = {};", "const import_meta = importMeta.meta;")
+            let bod = result.code.substring(head_i + find.length)
+            while(bod.indexOf("Promise.resolve().then(() => __toModule(require(") >= 0){
+                bod = bod.replace("Promise.resolve().then(() => __toModule(require(", "((asyncRequire(")
+            }
+            while(bod.indexOf("Promise.resolve().then(() => __toESM(require(") >= 0){
+                bod = bod.replace("Promise.resolve().then(() => __toESM(require(", "((asyncRequire(")
+            }
+            result.code = h + bod
+        }
+
+
+        if(head_i < 0){
+            head_i = result.code.length
+        }
         if(head_i >= 0){
             let head = result.code.substring(0, head_i)
             let lines = head.split(/\n/g)
@@ -2389,7 +2503,6 @@ export class Kawix{
         if(offset > 0) this.appArguments = this.appArguments.slice(offset)
         this.mainFilename = this.appArguments[0]
 
-
         let folder = process.env.RUNTIME_CACHE_FOLDER || Path.join(Os.homedir(), ".kawi")
         if(!folder.startsWith("/virtual")){
             if(!Fs.existsSync(folder)) Fs.mkdirSync(folder)
@@ -2404,13 +2517,21 @@ export class Kawix{
             this.$networkContentFolder = folder 
         }
         else{
-
             this.$mainFolder = folder
             this.$cacheFolder = Path.posix.join(folder, "genv2")
             this.$networkContentFolder = Path.posix.join(folder, "network")
-
         }
+
         
+        let esbuild = Path.join(this.$mainFolder, "esbuild.js")
+        if(Fs.existsSync(esbuild)){
+            try{
+                this.$esbuildTranspiler = require(esbuild)
+                this.transpiler = 'esbuild'
+            }catch(e){
+                console.info("> Failed set transpiler=esbuild")
+            }
+        }
     }
    
 

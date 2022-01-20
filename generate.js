@@ -1,5 +1,7 @@
 var fs = require("fs")
-global.Babel = require("./src/lib/babel.min.js")
+var Path= require("path")
+
+global.Babel = require(__dirname + "/src/lib/babel.min.js")
 
 var content = fs.readFileSync(__dirname + "/src/Kawix.ts", "utf8")
 var result = Babel.transform("//KWCORE--STARTING--LINE\n" + content, {
@@ -13,15 +15,15 @@ const $$Modules = {}
 
 
 $$Modules["./lib/babel.min.js"] = (function(module, exports){
-    ${fs.readFileSync("./src/lib/babel.min.js", "utf8")}
+    ${fs.readFileSync(__dirname + "/src/lib/babel.min.js", "utf8")}
 })
 
 $$Modules["./lib/babel.dynamic.import.js"] = (function(module, exports){
-    ${fs.readFileSync("./src/lib/babel.dynamic.import.js", "utf8")}
+    ${fs.readFileSync(__dirname + "/src/lib/babel.dynamic.import.js", "utf8")}
 })
 
 $$Modules["./lib/babel.import.meta.js"] = (function(module, exports){
-    ${fs.readFileSync("./src/lib/babel.import.meta.js", "utf8")}
+    ${fs.readFileSync(__dirname + "/src/lib/babel.import.meta.js", "utf8")}
 })
 
 const $$realRequire = require 
@@ -50,3 +52,9 @@ if(!fs.existsSync(__dirname + "/dist")){
 }
 fs.writeFileSync(__dirname + "/dist/kwruntime.js", text)
 fs.writeFileSync(__dirname + "/dist/Kawix.js", result.code)
+
+let distributionFolder = Path.join(__dirname, "..", "distribution", "core","dist")
+if(fs.existsSync(distributionFolder)){
+    fs.writeFileSync(distributionFolder + "/kwruntime.js", text)
+    fs.writeFileSync(distributionFolder + "/Kawix.js", result.code)
+}
