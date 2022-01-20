@@ -6,7 +6,7 @@
 
 ## 1.1.14
 
-- ```Binary typescript``` format (```.kwb``` and ```.kwc``` extension). It'` an special format with source code in typescript and binary content, that can be accesed programatically.
+- ```Binary typescript``` format (```.kwb``` and ```.kwc``` extension). It's an special format with source code in typescript and binary content, that can be accesed programatically.
 The advantage: only source code is loaded, all binary content is only readed when required. No need to convert to base64 the binary content. Good for package app into one file.
 
 
