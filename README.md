@@ -12,6 +12,9 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 ## Use the project
 
+
+**NOTE:** Using ```Try on Runkit``` seems no work without any special reason. Please test locally on your machine.
+
 - Changes history [CHANGES.md](./CHANGES.md)
 - Installation [INSTALL.md](./INSTALL.md)
 - Documentation [DOCS.md](./DOCS.md)
