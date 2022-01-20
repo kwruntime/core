@@ -992,6 +992,7 @@ Comment= `
         if(process.getuid() == 0){
             if(!Fs.existsSync("/usr/KwRuntime")) Fs.mkdirSync("/usr/KwRuntime")
             
+            if(Fs.existsSync(kawixFolder)) Fs.unlinkSync(kawixFolder)
             Fs.symlinkSync("/usr/KwRuntime", kawixFolder)
             kawixFolder = "/usr/KwRuntime"
         }

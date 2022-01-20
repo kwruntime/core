@@ -12,6 +12,7 @@ kwruntime is a custom nodejs runtime inspired by Deno / Babel. Is the best of bo
 
 ## Use the project
 
+- Changes history [[CHANGES.md](./changes.md)]
 - Installation [INSTALL.md](./INSTALL.md)
 - Documentation [DOCS.md](./DOCS.md)
 - Plugin for vscode, atom, etc: [https://github.com/kwruntime/vscode-plugin](https://github.com/kwruntime/vscode-plugin)
