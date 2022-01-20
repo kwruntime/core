@@ -1212,7 +1212,7 @@ export class Kawix{
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
-        "yarn": "github://kwruntime/std@1.1.13/package/yarn.ts",
+        "yarn": "github://kwruntime/std@1.1.14/package/yarn.ts",
         "pnpm": "github://kwruntime/std@69ec386/package/pnpm.ts"
     }
 
@@ -1236,7 +1236,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.14"
+        return "1.1.15"
     }
 
     get installer(){
