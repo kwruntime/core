@@ -1,3 +1,21 @@
+## 1.1.16
+
+- Update the ```yarn``` loader to be always auto-updated
+- Update the ```pnpm``` loader to be always auto-updated
+- Fixed bug on install 
+- Installer now add utils to PATH (downloaded only on first time or updated): ```npm```, ```npx```, ```node-gyp```, ```yarn```, ```yarnpkg```, ```pnpm```, ```pnpx```. This allow compatibility for more modules. For example: 
+
+```typescript
+// this module 'beamcoder-prebuild' require 'npx'
+// before kwruntime 1.1.16 this line fails:
+import beamcoder from 'npm://beamcoder-prebuild@0.6.15-rc.6' 
+```
+
+
+- Rollback default package loader to ```yarn``` . pnpm is not enough mature, has some problems with native modules.
+
+
+
 ## 1.1.15
 
 - Fix bug on installation as root on Linux

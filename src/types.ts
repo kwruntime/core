@@ -37,6 +37,7 @@ export interface ModuleImportInfo{
 	builtin?: boolean
 	request?: string 
 	items?: Array<ModuleInfo>,
+	moduleLoader?: any,
 	vars?: {
 		names: string[]
 		values: any[]

@@ -194,16 +194,18 @@ export class Installer{
     async selfInstall(){
 
         if(Os.platform() == "linux" || Os.platform() == "darwin" || Os.platform() == "android"){            
-            this.selfInstallUnix()
+            await this.selfInstallUnix()
             // DISABLE AUTO INSTALL OF KAWIX/CORE
             //await this.installKwcore()
         }
         else if(Os.platform() == "win32"){
-            this.selfInstallWin32()
+            await this.selfInstallWin32()
             // DISABLE AUTO INSTALL OF KAWIX/CORE
             //await this.installKwcore()
         }
 
+        // install utils
+        await this.installUtils()
     }
 
     setExtensions(options: ExtensionConfig){
@@ -247,11 +249,11 @@ export class Installer{
         }
         else{
             let local = paths.mainIcon = Path.join(Os.homedir(), ".local")
-            if(Fs.existsSync(local)){
+            if(!Fs.existsSync(local)){
                 Fs.mkdirSync(local)
             }
             local = Path.join(local, "share")
-            if(Fs.existsSync(local)){
+            if(!Fs.existsSync(local)){
                 Fs.mkdirSync(local)
             }
 
@@ -525,6 +527,8 @@ Comment= `
     async selfInstallWin32(){
         let kawixFolder = Path.join(Os.homedir(), "KwRuntime")
         if(!Fs.existsSync(kawixFolder)) Fs.mkdirSync(kawixFolder)
+        let utils = Path.join(kawixFolder, "utils")
+        if(!Fs.existsSync(utils)) Fs.mkdirSync(utils) 
         let bin = Path.join(kawixFolder, "bin")
         if(!Fs.existsSync(bin)) Fs.mkdirSync(bin) 
         let runtimeFolder = Path.join(kawixFolder, "runtime")
@@ -534,7 +538,7 @@ Comment= `
 
             // setx path
             let child= require("child_process")
-            child.execSync(`setx path "${bin};%path%"`)
+            child.execSync(`setx path "${bin};${utils};%path%"`)
 
         }
 
@@ -663,6 +667,175 @@ Comment= `
     }
 
 
+    async installUtils(){
+        // what utils? 
+        // npx
+        // npm
+        // node-gyp
+
+        // yarn?
+        // pnpm?
+
+        let kawixFolder = Path.join(Os.homedir(), "KwRuntime")
+        if(!Fs.existsSync(kawixFolder)) Fs.mkdirSync(kawixFolder)
+        
+        let utils = Path.join(kawixFolder, "utils")
+        if(!Fs.existsSync(utils)) Fs.mkdirSync(utils)
+
+        let executerContent = `#!/usr/bin/env kwrun
+        import Path from 'path'
+        import Os from 'os'
+        import fs from 'fs'
+        import Child from 'child_process'
+        
+        export class Runner{
+        
+        
+            static async execute(modname: string, bin: string = '', force:boolean = false){
+        
+                let kawi = Path.join(Os.homedir(), ".kawi")
+                let utils = Path.join(kawi, "utils")
+                if(!fs.existsSync(utils)){
+                    fs.mkdirSync(utils)
+                }
+        
+                let file = Path.join(utils,  modname + ".json")
+                let data = null, needcheck = false
+                if(fs.existsSync(file)){
+                    let content = await fs.promises.readFile(file,'utf8')
+                    try{
+                        data = JSON.parse(content)
+                    }catch(e){}
+        
+                    if(data){
+                        if(Date.now() - data.time > (24*3600000)){
+                            needcheck = true
+                        }
+                    }
+                }
+                
+                if(force) data = null
+                needcheck = needcheck || (!data)
+                // get last version of npm?
+                if(needcheck){
+                    let uid = parseInt(String(Date.now()/24*3600000)).toString() + ".json"
+                    let pack = await import("https://unpkg.com/"+modname+"/package.json?date=" + uid)
+        
+                    if(pack.version != data?.version){
+        
+                        console.info("> Installing/Updating "+modname+" version:", pack.version)
+                        let mod = await import(${JSON.stringify(Kawix.packageLoaders.pnpm)})
+                        let reg = new mod.Registry()
+                        data = await reg.resolve(modname + "@" + pack.version)
+                        data.time = Date.now()
+                        
+                    }
+                }
+        
+                if(!data){
+                    console.error("> Failed to get/install " + modname)
+                    return process.exit(1)
+                } 
+        
+        
+                if(needcheck){
+                    await fs.promises.writeFile(file, JSON.stringify(data))
+                }
+                let exes = data.packageJson.bin || {}
+                if(!bin){
+                    bin = Object.keys(exes)[0]
+                }
+        
+                let cli = Path.join(data.folder, exes[bin] || exes)
+                if(!fs.existsSync(cli)){
+                    cli += ".js"
+                    if(!fs.existsSync(cli)){
+                        return this.execute(modname, bin, true)
+                    }
+                }
+                let p = Child.spawn(process.execPath, [cli, ...process.argv.slice(3)],{
+                    stdio:'inherit'
+                })
+                p.on("exit", (code)=> process.exit(code))
+                
+        
+            }
+        }
+        `;
+
+
+        let runfile = Path.join(utils, "run.ts")
+        await Fs.promises.writeFile(runfile, executerContent)
+
+        // generate files for each 
+        let npm = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("npm", "npm")
+        `;
+
+        let npx = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("npm", "npx")
+        `;
+
+        let nodegyp = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("node-gyp")
+        `;
+
+        let yarn = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("yarn", "yarn")
+        `;
+
+        let yarnpkg = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("yarn", "yarnpkg")
+        `;
+
+        let pnpm = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("pnpm", "pnpm")
+        `;
+
+        let pnpx = `#!/usr/bin/env kwrun
+        import {Runner} from ${JSON.stringify(runfile)}
+        Runner.execute("pnpm", "pnpx")
+        `;
+
+
+        let ext = ''
+        let files = {
+            npm,
+            npx,
+            "node-gyp": nodegyp,
+            yarn,
+            yarnpkg,
+            pnpm,
+            pnpx
+        }
+
+        if(Os.platform() == "win32") ext = '.ts'
+
+        for(let id in files){
+            let file = Path.join(utils, id + ext)
+            await Fs.promises.writeFile(file, files[id])
+            if(Os.platform() != "win32")
+                await Fs.promises.chmod(file, "775")
+        }
+
+        if(Os.platform() == "win32"){
+            for(let id in files){
+                let file = Path.join(utils, id + ".cmd")
+                let filets = Path.join(utils, id + ".ts")
+                let content = `@echo off\n"${process.argv[0]}" "${process.argv[1]}" "${filets}" %*`
+                await Fs.promises.writeFile(file, content)
+            }
+        }
+
+    }
+
+
     async installKwcoreWin32(){
 
         let $paths = this.$runtimePaths()
@@ -782,7 +955,9 @@ Comment= `
         let exe = this.$kawix.executable
         let uri = "https://raw.githubusercontent.com/kodhework/kawix/master/core/dist/kwcore.app.js"
         await new Promise(function(resolve, reject){
-            https.get(uri, (res)=> {
+            https.get(uri, {
+                timeout: Number(process.env.REQUEST_TIMEOUT || 8000)
+            }, (res)=> {
                 try{
                     let buffer = []
                     res.on("data", function(bytes){
@@ -1002,6 +1177,9 @@ Comment= `
         let bin = Path.join(kawixFolder, "bin")
         if(!Fs.existsSync(bin)) Fs.mkdirSync(bin) 
 
+        let utils = Path.join(kawixFolder, "utils")
+        if(!Fs.existsSync(utils)) Fs.mkdirSync(utils) 
+
         // generate 
         let exe = this.$kawix.executable
         let nodev = process.version.split(".")[0].substring(1)
@@ -1049,7 +1227,7 @@ Comment= `
             Fs.symlinkSync(Path.join(bin, "kwrun-legacy-n" + v), Path.join(bin, "kwrun-legacy"))
 
         }
-        this.$addPathUnix(bin)
+        this.$addPathUnix(bin + ":" + utils)
 
         await this.$desktopFile({
             appName: "kwrun",
@@ -1212,8 +1390,10 @@ export class Kawix{
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
-        "yarn": "github://kwruntime/std@1.1.14/package/yarn.ts",
-        "pnpm": "github://kwruntime/std@69ec386/package/pnpm.ts"
+        //"yarn": "github://kwruntime/std@1.1.14/package/yarn.ts",
+        yarn: "/home/james/projects/Kodhe/kwruntime/std/package/yarn.ts",
+        "pnpm": "github://kwruntime/std@88145ce/package/pnpm.ts"
+        //pnpm: "/home/james/projects/Kodhe/kwruntime/std/package/pnpm.ts"
     }
 
     $importing = new Map<string, any>() 
@@ -1226,7 +1406,7 @@ export class Kawix{
     $startParams:any = {}
 
     // now using pnpm as default loader
-    packageLoader: string = Kawix.packageLoaders["pnpm"]
+    packageLoader: string = Kawix.packageLoaders["yarn"]
     get $class(){
         return Kawix
     }
@@ -1236,7 +1416,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.15"
+        return "1.1.16"
     }
 
     get installer(){
@@ -1444,6 +1624,7 @@ export class Kawix{
 
             
             let req = items[url.startsWith("http:") ? "http": "https"].get(url, {
+                timeout: Number(process.env.REQUEST_TIMEOUT || 8000),
                 headers: {
                     "user-agent": userAgent
                 }
@@ -1823,10 +2004,17 @@ export class Kawix{
             return info.exports
         }
 
-        if(info.mode == "yarn"){
+        if(info.mode == "npm"){
             var m = null 
             for(let item of info.items){
-                if(!m) m = require(item.main)
+                if(!m){
+                    if(info.moduleLoader?.secureRequire){
+                        m = await info.moduleLoader.secureRequire(item)
+                    }
+                    else{
+                        m = require(item.main)
+                    }
+                }
             }
             return m 
         }
@@ -2058,7 +2246,8 @@ export class Kawix{
             //return await reg.require(name)
             return {
                 module: null,
-                mode: 'yarn',
+                mode: 'npm',
+                moduleLoader: reg,
                 items
             }
 
@@ -2450,7 +2639,7 @@ export class Kawix{
                 }
                 else{
                     let imInfo = await this.importInfo(requires[i], module, scope)
-                    if(imInfo.mode == "yarn"){
+                    if(imInfo.mode == "npm"){
                         for(let item of imInfo.items){
                             kitems[item.name] = item 
                         }
