@@ -31,6 +31,14 @@
                 "path": "runtime/winreg-vbs.tar.gz",
                 "compression": "tar+gz",
                 "href": "https://k.m3ga.work/raw/kodhe/kawix/id39"
+            },
+            {
+                "path": "runtime/default_executable.dll",
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/default_executable.dll"
+            },
+            {
+                "path": "runtime/default_gui_executable.dll",
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/default_gui_executable.dll"
             }
         ]
     },

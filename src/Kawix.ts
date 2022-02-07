@@ -1390,8 +1390,8 @@ export class Kawix{
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
-        //"yarn": "github://kwruntime/std@1.1.14/package/yarn.ts",
-        yarn: "/home/james/projects/Kodhe/kwruntime/std/package/yarn.ts",
+        "yarn": "github://kwruntime/std@88145ce/package/yarn.ts",
+        //yarn: "/home/james/projects/Kodhe/kwruntime/std/package/yarn.ts",
         "pnpm": "github://kwruntime/std@88145ce/package/pnpm.ts"
         //pnpm: "/home/james/projects/Kodhe/kwruntime/std/package/pnpm.ts"
     }
