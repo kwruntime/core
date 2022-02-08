@@ -4,17 +4,29 @@
             "x64": 
             [
                 {
-                    "version": "16.3.1",
-                    "name": "16.3.1-win32-x64.tar.gz",
+                    "version": "16.13.1",
+                    "name": "16.13.1-win32-x64.tar.gz",
                     "href": "https://k.m3ga.work/raw/kodhe/kawix/id49"
+                },
+                {
+                    "version": "16.13.1",
+                    "name": "16.6.2-win32-x64.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id51",
+                    "os": "<windows8"
                 }
             ],
             "x86": 
             [
                 {
-                    "version": "16.3.1",
-                    "name": "16.3.1-win32-x86.tar.gz",
+                    "version": "16.13.1",
+                    "name": "16.13.1-win32-x86.tar.gz",
                     "href": "https://k.m3ga.work/raw/kodhe/kawix/id50"
+                },
+                {
+                    "version": "16.6.2",
+                    "name": "16.6.2-win32-x86.tar.gz",
+                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id52",
+                    "os": "<windows8"
                 }
             ]
         },
