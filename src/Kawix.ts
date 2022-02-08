@@ -588,14 +588,15 @@ Comment= `
 
         let exe = this.$kawix.executable
         let nodev = process.version.split(".")[0].substring(1)
-        let content = `@echo off\n"${exe.cmd}" "${exe.args.join('" "')}" %*`
+        let content = `@echo off\r\nset NODE_SKIP_PLATFORM_CHECK=1\r\n"${exe.cmd}" "${exe.args.join('" "')}" %*`
         let binFile = Path.join(bin, "kwrun-n" + nodev + ".cmd")
         Fs.writeFileSync(binFile, content)
 
-        content = `@echo off\n"${exe.cmd}" --http-parser-legacy "${exe.args.join('" "')}" %*`
+        
+        content = `@echo off\r\nset NODE_SKIP_PLATFORM_CHECK=1\r\n"${exe.cmd}" --insecure-http-parser "${exe.args.join('" "')}" %*`
         binFile = Path.join(bin, "kwrun-legacy-n" + nodev + ".cmd")
         Fs.writeFileSync(binFile, content)
-
+        
 
         let files = Fs.readdirSync(bin)
         let fileinfo = files.filter((a) => a.startsWith("kwrun-") && a.endsWith(".cmd")).map((a)=> ({name: a, v: a.split("-").slice(-1)[0].split(".")[0].substring(1)}))
@@ -905,11 +906,11 @@ Comment= `
 
 
         let nodev = process.version.split(".")[0].substring(1)
-        let content = `@echo off\n"${exe.cmd}" "${kwcoreCli}" %*`
+        let content = `@echo off\r\nset NODE_SKIP_PLATFORM_CHECK=1\r\n"${exe.cmd}" "${kwcoreCli}" %*`
         let binFile = Path.join(bin, "kwcore-n" + nodev + ".cmd")
         Fs.writeFileSync(binFile, content)
 
-        content = `@echo off\n"${exe.cmd}" --http-parser-legacy "${kwcoreCli}" %*`
+        content = `@echo off\r\nset NODE_SKIP_PLATFORM_CHECK=1\r\n"${exe.cmd}" --insecure-http-parser "${kwcoreCli}" %*`
         binFile = Path.join(bin, "kwcore-legacy-n" + nodev + ".cmd")
         Fs.writeFileSync(binFile, content)
 
@@ -1049,7 +1050,7 @@ Comment= `
         Fs.chmodSync(binFile, "775")
 
 
-        content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy "${kwcoreCli}" "$@"\nexit $?`
+        content = `#!/usr/bin/env bash\n${exe.cmd} --insecure-http-parser "${kwcoreCli}" "$@"\nexit $?`
         binFile = Path.join(bin, "kwcore-legacy-n" + nodev)
         Fs.writeFileSync(binFile, content)
         Fs.chmodSync(binFile, "775")
@@ -1202,7 +1203,7 @@ Comment= `
         }*/
         
 
-        content = `#!/usr/bin/env bash\n${exe.cmd} --http-parser-legacy ${exe.args.join(" ")} "$@"\nexit $?`
+        content = `#!/usr/bin/env bash\n${exe.cmd} --insecure-http-parser ${exe.args.join(" ")} "$@"\nexit $?`
         binFile = Path.join(bin, "kwrun-legacy-n" + nodev)
         Fs.writeFileSync(binFile, content)
         Fs.chmodSync(binFile, "775")
