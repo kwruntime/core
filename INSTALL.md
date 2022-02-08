@@ -8,7 +8,7 @@ In Android you can install using Termux  (recommended Termux from F-Droid)
 * Linux (supported: ```x64, armv7, arm64```)
 
 ```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/linux.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
 ``` 
 
 * Windows (recommended way)
