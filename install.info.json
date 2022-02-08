@@ -47,7 +47,7 @@
             {
                 "path": "runtime/assemblies.tar.gz",
                 "compression": "tar+gz",
-                "href": "https://raw.githubusercontent.com/kwruntime/win32-installer/main/assemblies.tar.gz"
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/assemblies.tar.gz"
             }
         ]
     },
