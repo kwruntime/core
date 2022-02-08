@@ -546,6 +546,12 @@ Comment= `
             term: Path.join(runtimeFolder,"default_executable.dll"),
             gui: Path.join(runtimeFolder,"default_gui_executable.dll")
         }
+        if(!Fs.existsSync(defaultExes.term)){
+            defaultExes.term = Path.join(runtimeFolder,"default_executable.code")
+        }
+        if(!Fs.existsSync(defaultExes.gui)){
+            defaultExes.gui = Path.join(runtimeFolder,"default_gui_executable.code")
+        }
         if(!Fs.existsSync(defaultExes.term)) delete defaultExes.term
         if(!Fs.existsSync(defaultExes.gui)) delete defaultExes.gui
         let writeCmd = function(file:string, text:Buffer | string){

@@ -11,9 +11,9 @@ In Android you can install using Termux  (recommended Termux from F-Droid)
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/linux.sh | bash
 ``` 
 
-* Windows 
+* Windows (recommended way)
 
-Installer 32/64 bits: [https://github.com/kwruntime/core/releases/tag/win32-installer](https://github.com/kwruntime/core/releases/tag/win32-installer). The installer automatically download the last version.
+Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases). The installer automatically download latest version.
 
 
 * Android (with Termux)
@@ -32,7 +32,7 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/node.sh | bash
 ``` 
 
 
-* Install from git in any node supported platform (Linux, Mac, Windows, Android, etc)
+* Install from git in any node supported platform (Linux, Mac, Android, etc)
 
 ```bash 
 > git clone https://github.com/kwruntime/core kwruntime
@@ -41,7 +41,7 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/node.sh | bash
 > node index --self-install
 ```
 
-* Install using package manager (any nodejs supported platform)
+* Install using package manager (any nodejs supported platform, on windows this may not work use the installer)
 
 ```bash
 npm install -g @kwruntime/core
