@@ -45,12 +45,9 @@
                 "href": "https://k.m3ga.work/raw/kodhe/kawix/id39"
             },
             {
-                "path": "runtime/default_executable.dll",
-                "href": "https://raw.githubusercontent.com/kwruntime/win32-installer/main/default_executable.dll"
-            },
-            {
-                "path": "runtime/default_gui_executable.dll",
-                "href": "https://raw.githubusercontent.com/kwruntime/win32-installer/main/default_gui_executable.dll"
+                "path": "runtime/assemblies.tar.gz",
+                "compression": "tar+gz",
+                "href": "https://raw.githubusercontent.com/kwruntime/win32-installer/main/assemblies.tar.gz"
             }
         ]
     },

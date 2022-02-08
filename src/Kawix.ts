@@ -1288,7 +1288,7 @@ export class BinaryData{
         let binary = Kawix.$binaryMetadata.get(this.#filename)
         if(!binary){
             
-            let modCache = this.#kawix.$modCache.get(this.#filename)
+            let modCache = this.#kawix.$modCache.get(this.#filename) || {}
             //console.info("Here --->", modCache)
             let mod = (modCache.module || {}).exports || {}
             //let mod = await this.#kawix.import(this.#filename)    
@@ -2114,6 +2114,13 @@ export class Kawix{
             if(result){
                 result.cacheTime = Date.now()
                 this.$modCache.set(resolv.request, result)
+                let genname = result.vars.values[3]
+                if(genname)
+                    this.$modCache.set(genname, result)
+
+                if(result.filename)
+                    this.$modCache.set(result.filename, result)
+                
             }
 
 
