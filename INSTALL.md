@@ -13,7 +13,9 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/linux.sh | bash
 
 * Windows (recommended way)
 
-Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases). The installer automatically download latest version.
+Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases).
+
+The installer automatically download latest version.
 
 
 * Android (with Termux)
