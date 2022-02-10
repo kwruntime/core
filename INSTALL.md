@@ -21,7 +21,7 @@ The installer automatically download latest version.
 * Android (with Termux)
 
 ```bash 
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/android.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
 ```
 
 * Linux, Mac, Android with ```nodejs``` (please version 12 or higher)
@@ -30,7 +30,7 @@ Prerequisites:  Install nodejs from [https://nodejs.org/es/download/](https://no
 In Android Termux you can install using: ```pkg install nodejs-lts``` or ```pkg install nodejs```
 
 ```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@b4b5450/install/node.sh | bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/node.sh | bash
 ``` 
 
 
