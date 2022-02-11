@@ -1402,9 +1402,9 @@ export class Kawix{
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
-        "yarn": "github://kwruntime/std@5ddf0b9/package/yarn.ts",
+        "yarn": "github://kwruntime/std@09a9ea3/package/yarn.ts",
         //yarn: "/home/james/projects/Kodhe/kwruntime/std/package/yarn.ts",
-        "pnpm": "github://kwruntime/std@5ddf0b9/package/pnpm.ts"
+        "pnpm": "github://kwruntime/std@09a9ea3/package/pnpm.ts"
         //pnpm: "/home/james/projects/Kodhe/kwruntime/std/package/pnpm.ts"
     }
 
@@ -1418,7 +1418,8 @@ export class Kawix{
     $startParams:any = {}
 
     // now using pnpm as default loader
-    packageLoader: string = Kawix.packageLoaders["yarn"]
+    packageLoader: string = Kawix.packageLoaders["pnpm"]
+
     get $class(){
         return Kawix
     }
