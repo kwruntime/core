@@ -33,23 +33,27 @@
         "files": [
             {
                 "path": "runtime/Kawix.js",
+                "usage": "runtime,installer",
                 "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/Kawix.js"
             },
             {
                 "path": "runtime/kwruntime.js",
+                "usage": "runtime,installer",
                 "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/kwruntime.js"
             },
             {
                 "path": "runtime/winreg-vbs.tar.gz",
                 "compression": "tar+gz",
+                "usage": "installer",
                 "href": "https://k.m3ga.work/raw/kodhe/kawix/id39"
-            },
-            {
-                "path": "runtime/assemblies.tar.gz",
-                "compression": "tar+gz",
-                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/assemblies.tar.gz"
             }
-        ]
+        ],
+        "$saved": {
+            "path": "runtime/assemblies.tar.gz",
+            "compression": "tar+gz",
+            "usage": "installer",
+            "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/assemblies.tar.gz"
+        }
     },
     "linux": {
         "node": {
@@ -74,7 +78,7 @@
                     "href": "https://k.m3ga.work/raw/kodhe/kawix/id45"
                 }
             ],
-            "arm": 
+            "arm64": 
             [
                 {
                     "version": "16.3.0",
@@ -86,10 +90,12 @@
         "files": [
             {
                 "path": "runtime/Kawix.js",
+                "usage": "runtime,installer",
                 "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/Kawix.js"
             },
             {
                 "path": "runtime/kwruntime.js",
+                "usage": "runtime,installer",
                 "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/dist/kwruntime.js"
             }
         ]
