@@ -11,6 +11,12 @@ In Android you can install using Termux  (recommended Termux from F-Droid)
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
 ``` 
 
+* Mac OS (supported: ```x64, arm64```)
+
+```bash
+curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
+``` 
+
 * Windows (recommended way)
 
 Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases).
