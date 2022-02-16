@@ -2,7 +2,9 @@
 
 There are many options for installing kwruntime. You can install in any nodejs supported platform: Linux, Windows, Mac, Android, etc.
 
-In Android you can install using Termux  (recommended Termux from F-Droid)
+In Android you can install using Termux  (recommended Termux from F-Droid).
+
+This ways include file associations. 
 
 
 * Linux (supported: ```x64, armv7, arm64```)
@@ -30,15 +32,11 @@ The installer automatically download latest version.
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
 ```
 
-* Linux, Mac, Android with ```nodejs``` (please version 12 or higher)
 
-Prerequisites:  Install nodejs from [https://nodejs.org/es/download/](https://nodejs.org/es/download/) or using distro package manager.
-In Android Termux you can install using: ```pkg install nodejs-lts``` or ```pkg install nodejs```
 
-```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/node.sh | bash
-``` 
+### Using nodejs/package manager
 
+These installations doesn't include file associations.
 
 * Install from git in any node supported platform (Linux, Mac, Android, etc)
 
@@ -61,3 +59,5 @@ kwrun --self-install
 pnpm add @kwruntime --global
 kwrun --self-install
 ```
+
+
