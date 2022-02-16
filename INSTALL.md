@@ -7,26 +7,26 @@ In Android you can install using Termux  (recommended Termux from F-Droid).
 This ways include file associations. 
 
 
-* Linux (supported: ```x64, armv7, arm64```)
+* **Linux** (supported: ```x64, armv7, arm64```)
 
 ```bash
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
 ``` 
 
-* Mac OS (supported: ```x64, arm64```)
+* **Mac OS** (supported: ```x64, arm64```)
 
 ```bash
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
 ``` 
 
-* Windows (recommended way)
+* **Windows** (recommended way)
 
 Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases).
 
 The installer automatically download latest version.
 
 
-* Android (with Termux)
+* **Android** (with Termux)
 
 ```bash 
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
