@@ -1,3 +1,26 @@
+## 1.1.17 
+
+- Revert loader to ```pnpm``` but enable URI params for specify loader: 
+
+```typescript
+// use yarn
+import "npm://luxon@2.3.0?loader=yarn"
+// use pnpm
+import "npm://luxon@2.3.0?loader=pnpm"
+// use default: pnpm
+import "npm://luxon@2.3.0"
+```
+
+- Enable ENV_VARIABLES in npm imports: 
+
+```typescript 
+// Add env PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = 1
+import "npm://puppeteer@13.3.2?ENV_PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1"
+```
+
+- Improve Mac OS support
+- Added Mac OS installer
+
 ## 1.1.16
 
 - Update the ```yarn``` loader to be always auto-updated

@@ -23,6 +23,35 @@ kwcore.$init()
 let program = async function(){
     try{
 
+
+        if(kwcore.$startParams["mac"] !== undefined){
+            // start Terminal.app
+            let args = [process.argv[0]]
+            for(let i=0;i<process.argv.length;i++){
+                let arg = process.argv[i]
+                if(arg == "--mac" || arg.startsWith("--mac")){
+
+                }
+                else{
+                    args.push(arg)
+                }
+            }
+            let uiArgs = [
+                "-e",
+                "tell application \"Terminal\"",
+                "-e",
+                "Activate",
+                "-e",
+                "do script \"" + args.join(" ") + ";exit;\\n\"",
+                "-e",
+                "end tell"
+            ]
+            require("child_process").spawn("osascript", uiArgs, {
+                stdio:'inherit'
+            })
+            return  
+        }
+
         if(kwcore.$startParams["transpiler"] == "esbuild"){
             await kwcore.$enableEsbuildTranspiler()
         }

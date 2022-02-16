@@ -217,6 +217,34 @@ export class Installer{
         }
     }
 
+    async update(){
+
+        let id = parseInt(String(Date.now() / (24*3600000))) + ".json"
+        let platform = Os.platform()
+        let arch = Os.arch()
+        if(arch == "ia32") arch = "x86"
+
+        let pkg = await this.$kawix.import("gh+/kwruntime/core/package.json?date=" + id)
+        if(pkg.version != this.$kawix.version){
+            
+            let info = await this.$kawix.import("gh+/kwruntime/core/install.info.json?date=" + id)
+            let files = info[platform]?.files
+            if(!files){
+                console.error(`> No hay una actualización disponible para su plataforma: ${platform}-${arch}`)
+            }
+            console.info("> Actualizando a una nueva versión:", pkg.version)
+            files = files.filter((a) => a.usage.indexOf("node") >= 0)
+            // download files?
+            
+
+        }
+
+        
+        ///TODO
+
+
+    }
+
 
     $linuxGuiPaths(){
 
@@ -603,6 +631,10 @@ Comment= `
         let binFile = Path.join(bin, "kwrun-n" + nodev + ".cmd")
         Fs.writeFileSync(binFile, content)
 
+        content = `@echo off\r\n"${process.execPath}" %*`
+        binFile = Path.join(bin, "node-n" + nodev + ".cmd")
+        Fs.writeFileSync(binFile, content)
+
         
         content = `@echo off\r\nset NODE_SKIP_PLATFORM_CHECK=1\r\n"${exe.cmd}" --insecure-http-parser "${exe.args.join('" "')}" %*`
         binFile = Path.join(bin, "kwrun-legacy-n" + nodev + ".cmd")
@@ -617,26 +649,27 @@ Comment= `
             let v = fileinfo[fileinfo.length-1].v
             writeCmd(Path.join(bin, "kwrun.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-n" + v + ".cmd")))
             writeCmd(Path.join(bin, "kwrun-legacy.cmd"), Fs.readFileSync(Path.join(bin, "kwrun-legacy-n" + v + ".cmd")))
+            //writeCmd(Path.join(bin, "node.cmd"), Fs.readFileSync(Path.join(bin, "node-n" + v + ".cmd")))
 
-            //Fs.writeFileSync(Path.join(bin, "kwrun.cmd"), )
+            Fs.writeFileSync(Path.join(bin, "node.cmd"), Fs.readFileSync(Path.join(bin, "node-n" + v + ".cmd")))
             //Fs.writeFileSync(Path.join(bin, "kwrun-legacy.cmd"), )
         }
 
         await this.setExtensions({
             type: "application/kwruntime.script",
-            description: "Script de Kawix Runtime",
+            description: "KwRuntime Script",
             extensions: [".kws", ".kw.ts", ".kwc"],
             terminal: true
         })
         await this.setExtensions({
             type: "application/kwruntime.app",
-            description: "Aplicación de Kawix Runtime",
+            description: "KwRuntime Application",
             extensions: [".kwr", ".kwb"],
             terminal: false
         })
         await this.setExtensions({
             type: "application/kwruntime.package",
-            description: "Paquete de Kawix Runtime",
+            description: "KwRuntime Package",
             extensions: [".kwt"],
             terminal: false
         })
@@ -1402,9 +1435,9 @@ export class Kawix{
     static $binaryFiles = new Map<string, any>()
     static $modulesData = new Map<string, Map<string, any>>()
     static packageLoaders = {
-        "yarn": "github://kwruntime/std@09a9ea3/package/yarn.ts",
+        "yarn": "github://kwruntime/std@34542ea/package/yarn.ts",
         //yarn: "/home/james/projects/Kodhe/kwruntime/std/package/yarn.ts",
-        "pnpm": "github://kwruntime/std@09a9ea3/package/pnpm.ts"
+        "pnpm": "github://kwruntime/std@34542ea/package/pnpm.ts"
         //pnpm: "/home/james/projects/Kodhe/kwruntime/std/package/pnpm.ts"
     }
 
@@ -1419,6 +1452,7 @@ export class Kawix{
 
     // now using pnpm as default loader
     packageLoader: string = Kawix.packageLoaders["pnpm"]
+    packageLoaderEnv: {[key:string]: string} = {}
 
     get $class(){
         return Kawix
@@ -2261,7 +2295,8 @@ export class Kawix{
         else if(resolv.request.startsWith("npm://")){
 
             let uri = new URL(resolv.request)
-            let name = resolv.request.substring(6)
+            
+            let name = (uri.username ? (uri.username + "@" + uri.host + uri.pathname) :  uri.pathname.substring(2))
             let loader = this.packageLoader
             if(uri.searchParams){
                 let ploader = uri.searchParams.get("loader")
@@ -2272,6 +2307,18 @@ export class Kawix{
 
             let mod = await this.import(loader, null, scope)
             let reg = new mod.Registry()
+            for(let id in this.packageLoaderEnv){
+                reg.env[id] = this.packageLoaderEnv[id]
+            }
+            if(uri.searchParams && reg.env){
+                for(let key of uri.searchParams.keys()){
+                    if(key.startsWith("ENV_")){
+                        let envname = key.substring(4)
+                        let envvalue = uri.searchParams.get(key)
+                        reg.env[envname] = envvalue
+                    }
+                }
+            }
             let items = await reg.resolve(name)
             if(!(items instanceof Array)) items = [items]
             //return await reg.require(name)
