@@ -4,6 +4,7 @@ import Os from 'os'
 import Path from 'path'
 import crypto from 'crypto'
 
+import util from 'util'
 import http from 'http'
 import https from 'https'
 import {DesktopConfig,ExtensionConfig,ModuleInfo,ModuleImportInfo, Loader, CompiledResult} from './types'
@@ -2048,6 +2049,22 @@ export class Kawix{
     }
 
 
+    $convertToEsModule(mod){
+        if(!mod.__esModule){
+            // Babel need objects has __esModule property as true
+            let nm = Object.create(mod)
+            Object.defineProperty(nm, "__esModule", {
+                value: true,
+                enumerable: false
+            })
+            nm[util.inspect.custom] = function(depth, options){
+                return util.inspect(mod, options)
+            }
+            return nm
+        }
+        return mod
+    }
+
     async importFromInfo(info: ModuleImportInfo){
         if(info.builtin){
             return info.exports
@@ -2058,7 +2075,19 @@ export class Kawix{
             for(let item of info.items){
                 if(!m){
                     if(info.moduleLoader?.secureRequire){
-                        m = await info.moduleLoader.secureRequire(item)
+                        try{
+                            m = await info.moduleLoader.secureRequire(item)
+                        }
+                        catch(e){
+                            // maybe using nodejs import?
+                            if(e.message.indexOf("require() of ES") >= 0){
+                                m = await global["import"](item.main)
+                                m = this.$convertToEsModule(m)
+                            }
+                            else{
+                                throw e
+                            }
+                        }
                     }
                     else{
                         m = require(item.main)

@@ -1,5 +1,6 @@
-
-
+try{
+    global.import = (mod)=> import(mod)
+}catch(e){}
 
 var fs = require("fs")
 var Module = require("module")
@@ -23,26 +24,16 @@ kwcore.$init()
 let program = async function(){
     try{
 
-
-        if(kwcore.$startParams["mac"] !== undefined){
+        let macArgs = []
+        let openTerminalMac = function(){
             // start Terminal.app
-            let args = [process.argv[0]]
-            for(let i=0;i<process.argv.length;i++){
-                let arg = process.argv[i]
-                if(arg == "--mac" || arg.startsWith("--mac")){
-
-                }
-                else{
-                    args.push(arg)
-                }
-            }
             let uiArgs = [
                 "-e",
                 "tell application \"Terminal\"",
                 "-e",
                 "Activate",
                 "-e",
-                "do script \"" + args.join(" ") + ";exit;\\n\"",
+                "do script \"" + macArgs.join(" ") + ";exit;\"",
                 "-e",
                 "end tell"
             ]
@@ -50,6 +41,19 @@ let program = async function(){
                 stdio:'inherit'
             })
             return  
+        }
+
+        let useMac =  (kwcore.$startParams["mac"] !== undefined) || (kwcore.$startParams["osx"] !== undefined)
+        if(useMac){
+            for(let i=0;i<process.argv.length;i++){
+                let arg = process.argv[i]
+                if(arg == "--mac" || arg == "--osx" || arg.startsWith("--mac") || arg.startsWith("--osx")){
+                }
+                else{
+                    macArgs.push(arg)
+                }
+            }
+            process.argv = macArgs
         }
 
         if(kwcore.$startParams["transpiler"] == "esbuild"){
@@ -62,13 +66,16 @@ let program = async function(){
 
 
         if(kwcore.$startParams["self-install"] !== undefined){
+            //if(useMac) return openTerminalMac()
             await kwcore.installer.selfInstall()
         }
         else if(kwcore.$startParams["install-esbuild"] !== undefined){
+            //if(useMac) return openTerminalMac()
             await kwcore.$installEsbuild(kwcore.$startParams["install-esbuild"])
             console.info("> Esbuild transpiler installed. Now you can use with --transpiler=esbuild")
         }
         else if(kwcore.$startParams["install-kwcore"] !== undefined){
+            //if(useMac) return openTerminalMac()
             await kwcore.installer.installKwcore()
         }
         if(kwcore.$startParams["install"] !== undefined){
@@ -148,12 +155,17 @@ let program = async function(){
                     fname = Path.join(process.cwd(), fname)
                     global.kwcore.mainFilename = fname
                 }
-
-
-
                 let info = await global.kwcore.importInfo(fname, module, null, {
                     main: true
                 })
+                if(useMac){
+                    if(info.filename){
+                        if(info.filename.endsWith(".kw.ts") || info.filename.endsWith(".kws") || info.filename.endsWith(".kwc")){
+                            return openTerminalMac()
+                        }
+                    }
+                }
+
                 let mod = await global.kwcore.importFromInfo(info)
                 if(mod && mod.Program){
                     await mod.Program.main(global.kwcore.appArguments)
