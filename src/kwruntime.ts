@@ -78,7 +78,7 @@ export interface CompiledResult{
 
 
 export interface Kawix{
-
+	filename: string
 	appArguments: string[]
 	mainFilename: string 
 	optionsArguments: string[]
