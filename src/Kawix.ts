@@ -1,4 +1,4 @@
-import Fs, { fchownSync } from  'fs'
+import Fs from  'fs'
 import Module from 'module'
 import Os from 'os'
 import Path from 'path'
@@ -8,7 +8,7 @@ import util from 'util'
 import http from 'http'
 import https from 'https'
 import {DesktopConfig,ExtensionConfig,ModuleInfo,ModuleImportInfo, Loader, CompiledResult} from './types'
-
+import Url from 'url'
 
 
 class Deferred<T> {
@@ -1422,6 +1422,8 @@ export class BinaryData{
 
 export class Kawix{
 
+    $cacheType = 'json'
+
     appArguments: string[] = []
     //argv: string[]
     mainFilename: string
@@ -1594,18 +1596,41 @@ export class Kawix{
 
     $getCache(path: string){
         let md5 = crypto.createHash('md5').update(path).digest("hex")
-        let file = Path.posix.join(this.$cacheFolder, md5 + ".json"), stat = null, data = null
-        
+        let stat = null, data = null
+
+        let file = Path.posix.join(this.$cacheFolder, md5 + ".json")
+        if(this.$cacheType == "javascript"){
+            md5 = Path.basename(path) + "-" + md5
+            file = Path.posix.join(this.$cacheFolder, md5 + ".js")
+        }
+
         try{
             stat = Fs.statSync(path)
         }
         catch(e){}
         if(!stat) return null 
-
         if(!Fs.existsSync(file)) return 
 
-        let content = Fs.readFileSync(file, "utf8")
-        data = JSON.parse(content)
+        
+        if(this.$cacheType == "javascript"){
+            /*delete require.cache[file]
+            data = require(file).default
+            */
+            let content = Fs.readFileSync(file, "utf8")
+            let i = content.indexOf("// KAWIX END CACHE\n")
+            data= JSON.parse(content.substring(13, i))
+            
+            i = content.indexOf("// KAWIX RESULT CODE\n")
+            let y = content.lastIndexOf("// KAWIX RESULT CODE\n")
+            if(data.result){
+                data.result.code = content.substring(i+21,y)
+            }
+        }
+        else{
+            let content = Fs.readFileSync(file, "utf8")
+            data = JSON.parse(content)
+        }
+
         
         let mtimeMs = Math.ceil(stat.mtimeMs / 1000) * 1000
         if(data.mtimeMs == mtimeMs){
@@ -1617,8 +1642,42 @@ export class Kawix{
 
     $saveCache(path: string, cache: any){
         let md5 = crypto.createHash('md5').update(path).digest("hex")
-        let file = Path.join(this.$cacheFolder, md5 + ".json")
-        Fs.writeFileSync(file, JSON.stringify(cache))
+        if(this.$cacheType == "javascript"){
+            md5 = Path.basename(path) + "-" + md5
+
+            let ncache = Object.assign({},cache)
+            let code = ncache.result.code
+            if(code){
+                delete ncache.result.code
+            }
+            let str = []
+            str.push("var $_cache = ")
+            str.push(JSON.stringify(ncache))
+            str.push("// KAWIX END CACHE")
+            str.push("")
+
+            str.push("var $_func = function(){")
+            str.push("// KAWIX RESULT CODE")
+            str.push(code)
+            str.push("// KAWIX RESULT CODE")
+            str.push("}")
+            str.push("")
+            str.push("")
+            //str.push("var $_cache = // KAWIX RESULT JSON\n" + JSON.stringify(ncache, null, '\t') + "\n// KAWIX RESULT JSON")
+            //str.push("var $_cache = { mtimeMs: Number($_vars[0]), requires: $_vars[1].split('$$?'), filename: $_vars[2], time: Number($_vars[3]), result: {}};")
+
+            str.push("if($_cache.result){")
+            str.push("\tvar $_lines = $_func.toString().split('\\n')")
+            str.push("\t$_cache.result.code = $_lines.slice(2, $_lines.length - 2).join('\\n')")
+            str.push("}")
+            str.push("exports.default = $_cache")
+            let file = Path.join(this.$cacheFolder, md5 + ".js")
+            Fs.writeFileSync(file, str.join("\n"))
+        }
+        else{
+            let file = Path.join(this.$cacheFolder, md5 + ".json")
+            Fs.writeFileSync(file, JSON.stringify(cache))
+        }        
     }
 
 
@@ -1881,6 +1940,9 @@ export class Kawix{
             }
         }
 
+        if(request.startsWith("file://")){
+            request = Url.fileURLToPath(request)
+        }
 
         let possibles = []
         if((request.startsWith("./") || request.startsWith("../")) &&  parent?.__kawix__virtual){
@@ -2709,6 +2771,7 @@ export class Kawix{
                     code: result.code
                 },
                 requires,
+                filename,
                 time: Date.now()
             }
             // save cache
@@ -2810,7 +2873,10 @@ export class Kawix{
             folder = Path.join(folder, "genv2")
             if(!Fs.existsSync(folder)) Fs.mkdirSync(folder)
             this.$cacheFolder = folder
-
+            if(this.$cacheType == "javascript"){
+                this.$cacheFolder = Path.join(this.$mainFolder, "compiled")
+                if(!Fs.existsSync(this.$cacheFolder)) Fs.mkdirSync(this.$cacheFolder)
+            }
             folder = Path.join(folder, "network")
             if(!Fs.existsSync(folder)) Fs.mkdirSync(folder)
             this.$networkContentFolder = folder 

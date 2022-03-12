@@ -181,6 +181,7 @@ let program = async function(){
 }
 
 exports.kwruntime = kwcore 
+kwcore.filename = __filename
 exports.kawix = kwcore 
 exports.Kawix = Kawix 
 exports.program = exports.default = program 
