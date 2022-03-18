@@ -7,8 +7,9 @@ import crypto from 'crypto'
 import util from 'util'
 import http from 'http'
 import https from 'https'
-import {DesktopConfig,ExtensionConfig,ModuleInfo,ModuleImportInfo, Loader, CompiledResult} from './types'
+import {DesktopConfig,ExtensionConfig,ModuleInfo,ModuleImportInfo, Loader, CompiledResult} from './kwruntime'
 import Url from 'url'
+
 
 
 class Deferred<T> {
@@ -484,7 +485,7 @@ Comment= `
             WinReg = require("winreg-vbs")
         }catch(e){
             // read from npm
-            WinReg = await Kawix.import("npm://winreg-vbs@1.0.0")
+            WinReg = await this.$kawix.import("npm://winreg-vbs@1.0.0")
         }
         WinReg.createKey([...extnames, `HKCU\\SOFTWARE\\Classes\\${name}`,
             `HKCU\\SOFTWARE\\Classes\\${name}\\DefaultIcon`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open`, `HKCU\\SOFTWARE\\Classes\\${name}\\Shell\\open\\command`], function(err) {
@@ -1466,7 +1467,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.17"
+        return "1.1.18"
     }
 
     get installer(){
@@ -1786,6 +1787,11 @@ export class Kawix{
                 //console.log('\x1b[32m[kwruntime] Downloading:\x1b[0m', urls[i])
                 let content = await getContent(urls[i])
                 Fs.writeFileSync(file, content)
+                let source = Path.join(Path.dirname(file), "sources", Path.basename(file))
+                Fs.writeFileSync(source, JSON.stringify({
+                    file,
+                    url: urls[i]
+                }))
                 this.$addOriginalURL(file, urls[i])
                 return {
                     file,
@@ -1925,6 +1931,10 @@ export class Kawix{
             }
         }
 
+        if(request.startsWith("file://")){
+            request = Url.fileURLToPath(request)
+        }
+
  
 
         if(!syncMode){
@@ -1940,9 +1950,7 @@ export class Kawix{
             }
         }
 
-        if(request.startsWith("file://")){
-            request = Url.fileURLToPath(request)
-        }
+        
 
         let possibles = []
         if((request.startsWith("./") || request.startsWith("../")) &&  parent?.__kawix__virtual){
@@ -2887,6 +2895,8 @@ export class Kawix{
             this.$networkContentFolder = Path.posix.join(folder, "network")
         }
 
+        let sourceFolder = Path.join(this.$networkContentFolder, "sources")
+        if(!Fs.existsSync(sourceFolder)) Fs.mkdirSync(sourceFolder)
         
         let esbuild = Path.join(this.$mainFolder, "esbuild.js")
         if(Fs.existsSync(esbuild)){

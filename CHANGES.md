@@ -1,3 +1,10 @@
+## 1.1.18 
+
+- Npm import: Allow import of ES6 modules
+- Add ```kawix.filename``` property with the fullpath to entry point
+- Minor bug fixes.
+ 
+
 ## 1.1.17 
 
 - Revert loader to ```pnpm``` but enable URI params for specify loader: 
