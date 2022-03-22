@@ -46,14 +46,14 @@
                 "compression": "tar+gz",
                 "usage": "installer",
                 "href": "https://k.m3ga.work/raw/kodhe/kawix/id39"
+            },
+            {
+                "path": "runtime/assemblies.tar.gz",
+                "compression": "tar+gz",
+                "usage": "installer",
+                "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/assemblies.tar.gz"
             }
-        ],
-        "$saved": {
-            "path": "runtime/assemblies.tar.gz",
-            "compression": "tar+gz",
-            "usage": "installer",
-            "href": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/assemblies.tar.gz"
-        }
+        ]
     },
     "linux": {
         "node": {
