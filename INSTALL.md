@@ -4,47 +4,48 @@ There are many options for installing kwruntime. You can install in any nodejs s
 
 In Android you can install using Termux  (recommended Termux from F-Droid).
 
-This ways include file associations. 
+Available options for install:
 
-* **Using node.js** for all platforms supported: (Linux, Mac OS, Windows, Android)
+1. **Using node.js** for all platforms supported: (Linux, Mac OS, Windows, Android)
 
-1. Install [nodejs](https://nodejs.org/en/download/) version 14 or superior.
+	* Install [nodejs](https://nodejs.org/en/download/) version 14 or superior.
 
-2. From cmd/terminal:
- 
-```bash
-npx @kwruntime/installer
-``` 
+	* From cmd/terminal:
+	
+	```bash
+	npx @kwruntime/installer
+	``` 
 
-You can use `pnpx` if you prefer.
+	You can use `pnpx` if you prefer.
 
 
-* **Linux** (supported: ```x64, armv7, arm64```)
+2. **Linux** (supported: ```x64, armv7, arm64```)
 
-```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
-``` 
+	```bash
+	curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
+	``` 
 
-* **Mac OS** (supported: ```x64, arm64```)
+3. **Mac OS** (supported: ```x64, arm64```)
 
-```bash
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
-``` 
+	```bash
+	curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
+	``` 
 
-* **Windows** 
+4. **Windows** 
 
-If you use Windows 8 or superior, it's recommended install using `npx` command (included with nodejs).
+	If you use Windows 8 or superior, it's recommended install using `npx` command (included with nodejs).
 
-Windows Instalers: [Go to downloads](https://github.com/kwruntime/installer/releases).
+	Windows Instalers: [Go to downloads](https://github.com/kwruntime/installer/releases).
 
-The installer automatically download latest version.
+	The installer automatically download latest version.
 
 
 * **Android** (with Termux)
 
-```bash 
-curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
-```
+	You can use this way if "using node.js" not working
+	```bash 
+	curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
+	```
 
 ## Installer project
 
