@@ -40,7 +40,7 @@ Available options for install:
 	The installer automatically download latest version.
 
 
-* **Android** (with Termux)
+5. **Android** (with Termux)
 
 	You can use this way if "using node.js" not working
 	```bash 
