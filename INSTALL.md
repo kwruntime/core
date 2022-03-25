@@ -31,7 +31,7 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
 ``` 
 
-* **Windows** (recommended way)
+* **Windows** 
 
 If you use Windows 8 or superior, it's recommended install using `npx`.
 Instaler: [Go to downloads](https://github.com/kwruntime/installer/releases).
