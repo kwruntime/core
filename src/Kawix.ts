@@ -875,7 +875,7 @@ Comment= `
             for(let id in files){
                 let file = Path.join(utils, id + ".cmd")
                 let filets = Path.join(utils, id + ".ts")
-                let content = `@echo off\n"${process.argv[0]}" "${process.argv[1]}" "${filets}" %*`
+                let content = `@echo off\nset NODE_SKIP_PLATFORM_CHECK=1\n"${process.argv[0]}" "${process.argv[1]}" "${filets}" %*`
                 await Fs.promises.writeFile(file, content)
             }
         }
@@ -1467,7 +1467,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.18"
+        return "1.1.19"
     }
 
     get installer(){

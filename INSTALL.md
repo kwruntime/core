@@ -6,6 +6,18 @@ In Android you can install using Termux  (recommended Termux from F-Droid).
 
 This ways include file associations. 
 
+* **Using node.js** for all platforms supported: (Linux, Mac OS, Windows, Android)
+
+1. Install [nodejs](https://nodejs.org/en/download/) version 14 or superior.
+
+2. From cmd/terminal:
+ 
+```bash
+npx @kwruntime/installer
+``` 
+
+You can use `pnpx` if you prefer.
+
 
 * **Linux** (supported: ```x64, armv7, arm64```)
 
@@ -21,7 +33,8 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
 
 * **Windows** (recommended way)
 
-Installer 32/64 bits: [Go to downloads](https://github.com/kwruntime/win32-installer/releases).
+If you use Windows 8 or superior, it's recommended install using `npx`.
+Instaler: [Go to downloads](https://github.com/kwruntime/installer/releases).
 
 The installer automatically download latest version.
 
@@ -32,32 +45,6 @@ The installer automatically download latest version.
 curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/android.sh | bash
 ```
 
+## Installer project
 
-
-### Using nodejs/package manager
-
-These installations doesn't include file associations.
-
-* Install from git in any node supported platform (Linux, Mac, Android, etc)
-
-```bash 
-> git clone https://github.com/kwruntime/core kwruntime
-> cd kwruntime
-> node generate
-> node index --self-install
-```
-
-* Install using package manager (any nodejs supported platform, on windows this may not work use the installer)
-
-```bash
-npm install -g @kwruntime/core
-kwrun --self-install
-# or 
-yarn global add @kwruntime/core
-kwrun --self-install
-# or
-pnpm add @kwruntime --global
-kwrun --self-install
-```
-
-
+If you are interested on see the source code of installer see here: [kwruntime/installer](https://github.com/kwruntime/installer)
