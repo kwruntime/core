@@ -34,7 +34,8 @@ curl https://cdn.jsdelivr.net/gh/kwruntime/core@9b00f0a/install/mac.sh | bash
 * **Windows** 
 
 If you use Windows 8 or superior, it's recommended install using `npx` command (included with nodejs).
-Instaler: [Go to downloads](https://github.com/kwruntime/installer/releases).
+
+Windows Instalers: [Go to downloads](https://github.com/kwruntime/installer/releases).
 
 The installer automatically download latest version.
 
