@@ -33,11 +33,11 @@ Available options for install:
 
 4. **Windows** 
 
-	If you use Windows 8 or superior, it's recommended install using `npx` command (included with nodejs).
+	If windows prompts false virus alert, please disable antivirus, or install using ```NodeJs``` like explained on method 1 here.
 
 	Windows Instalers: [Go to downloads](https://github.com/kwruntime/installer/releases).
 
-	The installer automatically download latest version.
+	The installer automatically download latest version for 32/64 bits.
 
 
 5. **Android** (with Termux)
