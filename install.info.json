@@ -1,4 +1,7 @@
 {
+    "script": {
+        "install": "https://raw.githubusercontent.com/kwruntime/distribution/main/core/install.js"
+    },
     "win32": {
         "node": {
             "x64": 
