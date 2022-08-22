@@ -2096,21 +2096,9 @@ export class Kawix{
         }
 
         if(info.executed){
-            //console.info(info.module.exports, info)
-            if(info.module.exports?.kawixDynamic){
-                let time = info.module.exports?.kawixDynamic?.time || 15000
-                if(Date.now() > (info.cacheTime + time)){
-                    // check if file is edited ...
-                    let stat = Fs.statSync(info.filename)
-                    if(stat.mtimeMs > info.cacheTime){
-                        this.$modCache.delete(request)
-                        delete require.cache[info.filename]
-                        return null 
-                    }
-                    else{
-                        info.cacheTime = Date.now()
-                    }
-                }
+            let hcache = this.$checkExports(info, request)
+            if(hcache){
+                return null
             }
             return {
                 data:info.module.exports
@@ -2118,6 +2106,27 @@ export class Kawix{
         }
     }
 
+    $checkExports(info, request){        
+        if(!info.module) return 
+        
+        let exports = info.module.exports        
+        if(exports?.kawixDynamic){
+            let time = exports?.kawixDynamic?.time || 15000
+            if(Date.now() > (info.cacheTime + time)){
+                // check if file is edited ...
+                let stat = Fs.statSync(info.filename)
+                if(stat.mtimeMs > info.cacheTime){
+                    this.$modCache.delete(request)
+                    delete require.cache[info.filename]
+                    return true
+                }
+                else{
+                    info.cacheTime = Date.now()
+                }
+            }
+        }
+
+    }
 
     $convertToEsModule(mod){
         if(!mod.__esModule){
@@ -2230,7 +2239,8 @@ export class Kawix{
         let resolv = this.importResolve(request, parent)
         let cached = this.$modCache.get(resolv.request)
         if(cached){
-            return cached 
+            if(!this.$checkExports(cached, resolv.request))
+                return cached 
         }
 
         let item = scope.get(resolv.request)
