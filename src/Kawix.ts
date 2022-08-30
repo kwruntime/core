@@ -1467,7 +1467,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.19"
+        return "1.1.21"
     }
 
     get installer(){
@@ -2093,6 +2093,11 @@ export class Kawix{
                     data: require(info.location.main)
                 }   
             }
+            if(info.exports){
+                return {
+                    data: info.exports
+                }
+            }
         }
 
         if(info.executed){
@@ -2101,7 +2106,7 @@ export class Kawix{
                 return null
             }
             return {
-                data:info.module.exports
+                data: info.module.exports
             }
         }
     }
@@ -2224,7 +2229,7 @@ export class Kawix{
     
     async importInfo(request, parent = null, scope : Map<string, any> = null, props = {}) : Promise<ModuleImportInfo>{
 
-        if(Module.builtinModules.indexOf(request) >= 0){
+        if((Module.builtinModules.indexOf(request) >= 0) || (request.startsWith("node:"))){
             return {
                 builtin: true,
                 exports: Module["_load"](request, parent)
@@ -2680,7 +2685,16 @@ export class Kawix{
 
 
     async defaultExecute(info:any, exports: any){
-        let func = Function(info.vars.names.join(","), info.result.code)
+        let code = info.result.code, func:any 
+        if(info.filename){
+            let vm = require("vm")
+            func = new vm.compileFunction(info.result.code, info.vars.names, {
+                filename: info.filename
+            })
+        }
+        else{
+            func = Function(info.vars.names.join(","), info.result.code)
+        }
         await func.apply(func, info.vars.values)
         delete exports.__kawix__compile
         if(exports.kawixPreload){
