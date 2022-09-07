@@ -24,10 +24,10 @@ md5=""
 case $(uname -m) in
     i386)   echo "Not supported"; exit 1 ;;
     i686)   echo "Not supported"; exit 1 ;;
-    x86_64) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id47/.name./node.tar.xz" ;;
-    armv7l) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
-    armv7) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
-    aarch64) nodeurl="https://k.m3ga.work/raw/kodhe/kawix/id46/.name./node.tar.xz" ;;
+    x86_64) nodeurl="https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id47/.name./node.tar.xz" ;;
+    armv7l) nodeurl="https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
+    armv7) nodeurl="https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id45/.name./node.tar.xz" ;;
+    aarch64) nodeurl="https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id46/.name./node.tar.xz" ;;
     *)   echo "Unable to determine system architecture."; exit 1 ;;
 esac
 
