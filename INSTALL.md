@@ -22,7 +22,7 @@ Available options for install:
 2. **Linux** (supported: ```x64, armv7, arm64```)
 
 	```bash
-	curl https://cdn.jsdelivr.net/gh/kwruntime/core@2bd3f1c/install/linux.sh | bash
+	curl https://cdn.jsdelivr.net/gh/kwruntime/core@af18792/install/linux.sh | bash
 	``` 
 
 3. **Mac OS** (supported: ```x64, arm64```)
