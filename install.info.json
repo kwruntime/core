@@ -9,12 +9,12 @@
                 {
                     "version": "16.13.1",
                     "name": "16.13.1-win32-x64.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id54"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id54"
                 },
                 {
                     "version": "16.6.2",
                     "name": "16.6.2-win32-x64.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id51",
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id51",
                     "os": "<windows8"
                 }
             ],
@@ -23,12 +23,12 @@
                 {
                     "version": "16.13.1",
                     "name": "16.13.1-win32-x86.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id53"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id53"
                 },
                 {
                     "version": "16.6.2",
                     "name": "16.6.2-win32-x86.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id52",
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id52",
                     "os": "<windows8"
                 }
             ]
@@ -48,7 +48,7 @@
                 "path": "runtime/winreg-vbs.tar.gz",
                 "compression": "tar+gz",
                 "usage": "installer",
-                "href": "https://k.m3ga.work/raw/kodhe/kawix/id39"
+                "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id39"
             },
             {
                 "path": "runtime/assemblies.tar.gz",
@@ -65,12 +65,12 @@
                 {
                     "version": "14.17.4",
                     "name": "14.17.4-linux-x64.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id10"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id10"
                 },
                 {
                     "version": "16.3.0",
                     "name": "16.3.0-linux-x64.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id47"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id47"
                 }
             ],
             "arm": 
@@ -78,7 +78,7 @@
                 {
                     "version": "16.3.0",
                     "name": "16.3.0-linux-arm.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id45"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id45"
                 }
             ],
             "arm64": 
@@ -86,7 +86,7 @@
                 {
                     "version": "16.3.0",
                     "name": "16.3.0-linux-arm64.tar.gz",
-                    "href": "https://k.m3ga.work/raw/kodhe/kawix/id46"
+                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id46"
                 }
             ]
         },
