@@ -1467,7 +1467,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.21"
+        return "1.1.22"
     }
 
     get installer(){
@@ -2408,11 +2408,20 @@ export class Kawix{
         }
         else if(resolv.request.startsWith("npm://")){
 
-            let uri = new URL(resolv.request)
+            //let uri = new URL(resolv.request)
+            let name = resolv.request.substring(6)
+            let pindex = name.indexOf("?")
+            let uri:URL =  new URL("http://127.0.0.1")
+            if(pindex >= 0){
+                let search1 = name.substring(pindex)
+                name = name.substring(0, pindex)
+                uri = new URL("/index"+search1, "http://127.0.0.1")
+            }
+
             
-            let name = (uri.username ? (uri.username + "@" + uri.host + uri.pathname) :  uri.pathname.substring(2))
+            //let name = (uri.username ? (uri.username + "@" + uri.host + uri.pathname) :  uri.pathname.substring(2))
             let loader = this.packageLoader
-            if(uri.searchParams){
+            if(uri?.searchParams){
                 let ploader = uri.searchParams.get("loader")
                 if(ploader){
                     loader = Kawix.packageLoaders[ploader] || loader
@@ -2424,7 +2433,7 @@ export class Kawix{
             for(let id in this.packageLoaderEnv){
                 reg.env[id] = this.packageLoaderEnv[id]
             }
-            if(uri.searchParams && reg.env){
+            if(uri?.searchParams && reg.env){
                 for(let key of uri.searchParams.keys()){
                     if(key.startsWith("ENV_")){
                         let envname = key.substring(4)
