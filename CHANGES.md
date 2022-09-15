@@ -99,3 +99,8 @@ export var kawixDynamic = {
 - Experimental ```esbuild``` transpiler. No ready to use. Can be used instead of internal Babel, using parameter: ```--transpiler=esbuild``` 
 
 	**NOTE:** If you use and have problems, please remove folder: ```~/.kawi/genv2``` on unix systems, or ```%userprofile%\.kawi\genv2``` on windows.
+
+
+## 1.1.22
+
+- Fix bug on ```import``` npm modules starting with ```@```
