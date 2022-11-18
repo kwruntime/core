@@ -1,3 +1,32 @@
+## 1.1.25
+
+- Add ```customImportInfo``` on global.kawix for allow importInfo in a custom way. 
+- ```customImporter``` can be removed at future. You can use instead ```customImportInfo``` to returns custom modules: 
+
+Example: 
+
+```typescript
+global.kawix.customImportInfo.push(function(request, parent){
+	if(request == "example_non_existent_module"){
+		return {
+			mode: "custom",
+			load: function(){
+				return {
+					default(){
+						console.log("Default exports is a function on this virtual module")
+					},
+					time: Date.now()
+				}
+			}
+		}
+	}
+})
+```
+
+## 1.1.24
+
+- Add ```customImporter``` on global.kawix for allow import in a custom way
+
 ## 1.1.18 
 
 - Npm import: Allow import of ES6 modules

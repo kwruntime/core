@@ -1431,6 +1431,7 @@ export class Kawix{
     optionsArguments: string[] = []
     originalArgv: string[]
     customImporter = new Array<Function>()
+    customImportInfo = new Array<Function>()
     transpiler = 'babel'
     $esbuildTranspiler = null
 
@@ -1467,7 +1468,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.24"
+        return "1.1.25"
     }
 
     get installer(){
@@ -2190,6 +2191,10 @@ export class Kawix{
             return m 
         }
 
+        if(info.mode == "custom"){
+            return info.load()
+        }
+
         if(info.mode == "node"){
             if(info.location){
                 return require(info.location.main)
@@ -2248,6 +2253,17 @@ export class Kawix{
 
     
     async importInfo(request, parent = null, scope : Map<string, any> = null, props = {}) : Promise<ModuleImportInfo>{
+
+
+        if(this.customImportInfo?.length){
+            for(let importer of this.customImportInfo){
+                try{
+                    let info = await importer(request, parent)    
+                    if(info) return info
+                }catch(e){
+                }
+            }
+        }
 
         if((Module.builtinModules.indexOf(request) >= 0) || (request.startsWith("node:"))){
             return {

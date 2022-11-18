@@ -38,6 +38,7 @@ export interface ModuleImportInfo{
 	request?: string 
 	items?: Array<ModuleInfo>,
 	moduleLoader?: any,
+	load?(): any,
 	vars?: {
 		names: string[]
 		values: any[]
@@ -84,6 +85,8 @@ export interface Kawix{
 	optionsArguments: string[]
 	originalArgv: string[]
 	customImporter : Array<Function>
+	customImportInfo : Array<Function>
+
 	argv?: string[]
 	version?: string 
 	installer: any 
