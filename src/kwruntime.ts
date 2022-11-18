@@ -83,7 +83,7 @@ export interface Kawix{
 	mainFilename: string 
 	optionsArguments: string[]
 	originalArgv: string[]
-
+	customImporter : Array<Function>
 	argv?: string[]
 	version?: string 
 	installer: any 

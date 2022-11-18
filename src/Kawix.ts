@@ -1430,7 +1430,7 @@ export class Kawix{
     mainFilename: string
     optionsArguments: string[] = []
     originalArgv: string[]
-
+    customImporter = new Array<Function>()
     transpiler = 'babel'
     $esbuildTranspiler = null
 
@@ -1467,7 +1467,7 @@ export class Kawix{
     }
 
     get version(){
-        return "1.1.22"
+        return "1.1.24"
     }
 
     get installer(){
@@ -1940,11 +1940,20 @@ export class Kawix{
         if(!syncMode){
             if((request.startsWith("./") || request.startsWith("../") || request.startsWith("/")) &&  parent?.__kawix__network){
                 if(!request.startsWith("/virtual")){
-                    let newUri = new URL(request, parent.__kawix__meta.uri)
-                    let url = `${newUri.protocol}//${newUri.host}${newUri.pathname}${newUri.search}`
-                    return {
-                        from : "network",
-                        request: url
+                    
+                    let isfile = false 
+                    if(Path.isAbsolute(request)){
+                        // maybe is a file 
+                        isfile = Fs.existsSync(request)
+                    }
+
+                    if(!isfile){
+                        let newUri = new URL(request, parent.__kawix__meta.uri)
+                        let url = `${newUri.protocol}//${newUri.host}${newUri.pathname}${newUri.search}`
+                        return {
+                            from : "network",
+                            request: url
+                        }
                     }
                 }
             }
@@ -2218,6 +2227,17 @@ export class Kawix{
    
 
     async import(request, parent = null, scope : Map<string, any> = null){
+
+        if(this.customImporter?.length){
+            for(let importer of this.customImporter){
+                try{
+                    let mod = await importer(request, parent)    
+                    if(mod) return mod
+                }catch(e){
+                }
+            }
+        }
+
         let cache = this.$getCachedExports(request)
         if(cache) return cache.data
 

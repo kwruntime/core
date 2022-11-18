@@ -1,10 +1,40 @@
+var Path = require("path")
+if((process.env.ELECTRON_RUN_AS_NODE == 1) || (process.env.RUN_AS_NODE == 1)){
+    
+    // execute as normal nodejs
+    process.argv.splice(1, 1)
+    let offset = 1, filename = '', args = []
+    while(true){
+        filename = process.argv[offset]
+        if(!filename) break 
+        if(!filename.startsWith("--")) break 
+        offset++
+        args.push(filename)
+        filename = null
+    }
+
+    if(filename){
+        let modfile = Path.resolve(process.cwd(), filename)
+        process.argv = [process.execPath, modfile, ... (process.argv.slice(offset+1)) ]
+        process.env.NODE_OPTIONS = (process.env.NODE_OPTIONS ? (process.env.NODE_OPTIONS + " ") : "") + args.join(" ")
+        module.exports = require(modfile)
+        return 
+    }else{
+        console.info(`Welcome to Node.js ${process.version}.`)
+        console.info('Type ".help" for more information.')
+        require("repl").start()
+        return 
+    }
+}
+
+
 try{
     global.import = (mod)=> import(mod)
 }catch(e){}
 
 var fs = require("fs")
 var Module = require("module")
-var Path = require("path")
+
 
 
 
@@ -129,6 +159,15 @@ let program = async function(){
                     let name = global.kwcore.appArguments[i]
                     try{
                         let info = g(await global.kwcore.importInfo(name))
+                        if(name.endsWith(".kwb") || name.endsWith(".kwc")){
+                            try{
+                                let mod = await global.kwcore.import(name)
+                                if(mod.Program && mod.Program.typeDefinition){
+                                    info.filename = mod.Program.typeDefinition
+                                }
+                            }catch(e){
+                            }
+                        }
                         res.push(info)
                     }catch(e){
                         res.push({
