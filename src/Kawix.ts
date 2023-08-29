@@ -841,13 +841,13 @@ Comment= `
         `;
 
 
-        let runfile1 = _path.default.join(utils, "krun.ts");
+        let runfile1 = Path.join(utils, "krun.ts");
 
-    await _fs.default.promises.writeFile(runfile1, executerContent);
+    await Fs.promises.writeFile(runfile1, executerContent);
 
-    let runfile = _path.default.join(utils, "run.js");
+    let runfile = Path.join(utils, "run.js");
 
-    await _fs.default.promises.writeFile(runfile, executerContentNode); // generate files for each 
+    await Fs.promises.writeFile(runfile, executerContentNode); // generate files for each 
 
     let npm = `#!/usr/bin/env node
         const {Runner} = require(${JSON.stringify(runfile)})
