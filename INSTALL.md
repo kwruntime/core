@@ -6,23 +6,10 @@ In Android you can install using Termux  (recommended Termux from F-Droid).
 
 Available options for install:
 
-1. **Using node.js** for all platforms supported: (Linux, Mac OS, Windows, Android)
-
-	* Install [nodejs](https://nodejs.org/en/download/) version 14 or superior.
-
-	* From cmd/terminal:
-	
-	```bash
-	npx @kwruntime/installer
-	``` 
-
-	You can use `pnpx` if you prefer.
-
-
-2. **Linux** (supported: ```x64, armv7, arm64```)
+1. **Linux**. Now use ```nvm``` for install.
 
 	```bash
-	curl https://cdn.jsdelivr.net/gh/kwruntime/core@af18792/install/linux.sh | bash
+	curl https://cdn.jsdelivr.net/gh/kwruntime/core@50d6884/install/linux.sh | bash
 	``` 
 
 3. **Mac OS** (supported: ```x64, arm64```)
@@ -48,5 +35,5 @@ Available options for install:
 	```
 
 ## Installer project
-
+81F2-95D0
 If you are interested on see the source code of installer see here: [kwruntime/installer](https://github.com/kwruntime/installer)
