@@ -48,7 +48,7 @@
                 "path": "runtime/winreg-vbs.tar.gz",
                 "compression": "tar+gz",
                 "usage": "installer",
-                "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id39"
+                "href": "https://raw.githubusercontent.com/voxsoftware/packages/master/winreg-vbs%401.0.0.tar.gz"
             },
             {
                 "path": "runtime/assemblies.tar.gz",

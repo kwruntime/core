@@ -1508,7 +1508,7 @@ export class Kawix{
 	}
 
 	get version(){
-		return "1.1.35"
+		return "1.1.37"
 	}
 
 	get installer(){
@@ -2717,7 +2717,9 @@ export class Kawix{
 				mod = Module["_load"](filename, parent)
 				module = Module["_cache"][filename]
 			}
-
+			else{
+				mod = module.exports 
+			}
 
 			let base = {
 				module,

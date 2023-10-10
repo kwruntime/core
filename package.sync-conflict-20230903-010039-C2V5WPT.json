@@ -1,0 +1,39 @@
+{
+    "name": "@kwruntime/core",
+    "version": "1.1.25",
+    "main": "index.js",
+    "keywords": [
+        "loader",
+        "transpiler",
+        "module",
+        "next",
+        "ecmascript",
+        "async",
+        "import",
+        "kawix",
+        "kodhe",
+        "kwruntime",
+        "es2020",
+        "esnext",
+        "typescript"
+    ],
+    "scripts":{
+        "global-install": "node cli.js --self-install"
+    },
+    "bin": {
+        "kwrun": "./cli.js"
+    },
+    "engines" : {
+        "node" : ">=12"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kwruntime/core.git"
+    },
+        "author": "Kodhe <developer@kodhe.com>",
+        "license": "MIT",
+        "bugs": {
+        "url": "https://github.com/kwruntime/core/issues"
+    },
+    "homepage": "https://github.com/kwruntime/core#readme"
+}
