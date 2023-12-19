@@ -7,28 +7,28 @@
             "x64": 
             [
                 {
-                    "version": "16.13.1",
-                    "name": "16.13.1-win32-x64.tar.gz",
-                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id54"
+                    "version": "20.10.0",
+                    "name": "20.10.0-win32-x64.tar.gz",
+                    "href": "https://db.kode.best/s/media/-/programs/KwRuntime/win32-v20.10.0-x64.tar.gz"
                 },
                 {
                     "version": "16.6.2",
                     "name": "16.6.2-win32-x64.tar.gz",
-                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id51",
+                    "href": "https://db.kode.best/s/media/-/programs/KwRuntime/16.6.2-win32-x64.tar.gz",
                     "os": "<windows8"
                 }
             ],
             "x86": 
             [
                 {
-                    "version": "16.13.1",
-                    "name": "16.13.1-win32-x86.tar.gz",
-                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id53"
+                    "version": "20.10.0",
+                    "name": "20.10.0-win32-x86.tar.gz",
+                    "href": "https://db.kode.best/s/media/-/programs/KwRuntime/win32-v20.10.0-x64.tar.gz"
                 },
                 {
                     "version": "16.6.2",
                     "name": "16.6.2-win32-x86.tar.gz",
-                    "href": "https://drive.kodhe.com/krade.tg/raw/kodhe/kawix/id52",
+                    "href": "https://db.kode.best/s/media/-/programs/KwRuntime/16.6.2-win32-x86.tar.gz",
                     "os": "<windows8"
                 }
             ]
